@@ -4,22 +4,28 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Mike Holzinger</title>
+        <title>Breaking out of the traditional Docker model in Gitlab</title>
         <link rel="stylesheet" href="http://cipherpop.com/theme/css/main.css" />
         <link href="http://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mike Holzinger Atom Feed" />
+        <meta name="description" content="Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a..." />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="http://cipherpop.com/">Mike Holzinger</a></h1>
                 <nav><ul>
-                    <li><a href="http://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a></li>
+                    <li class="active"><a href="http://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://cipherpop.com/breaking-out-of-docker.html" rel="bookmark"
+           title="Permalink to Breaking out of the traditional Docker model in Gitlab">Breaking out of the traditional Docker model in Gitlab</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="http://cipherpop.com/breaking-out-of-docker.html">Breaking out of the traditional Docker model in Gitlab</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-11-05T10:20:00-05:00">
                 Published: Sun 05 November 2023
@@ -30,7 +36,7 @@
         </address>
 <p>In <a href="http://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a>.</p>
 
-</footer><!-- /.post-info --><p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
+</footer><!-- /.post-info -->      <p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
 <p>Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation:</em></strong> <a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html">Use Docker to build Docker images</a></p>
 <p>As a project's complexity gradually increases, this adds an additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
@@ -97,8 +103,11 @@
 <h1>] Executing stages side by side</h1>
 <p>Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.</p>
 <p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: 2px dashed gray;" /></p>
-<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and one one network operation from the gitlab runner to publish to the artifact registry.</p>                </article>
-            </aside><!-- /#featured -->
+<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and one one network operation from the gitlab runner to publish to the artifact registry.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
