@@ -39,10 +39,10 @@
 </footer><!-- /.post-info -->      <p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
 <p>Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.</p>
 <p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation:</em></strong> <a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html">Use Docker to build Docker images</a></p>
-<p>As a project's complexity gradually increases, this adds an additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
+<p>As a project's complexity gradually increases, this adds additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
 <hr>
 <h1>] Our first pipeline commit job</h1>
-<p>An example below is using a docker image we will call <code>pythonapp-flask</code> being build using dind, first then repeating the same steps using a build using kaniko.</p>
+<p>An example below is using a docker image we will call <code>pythonapp-flask</code> being built using dind, first then repeating the same steps using a build using kaniko.</p>
 <div class="highlight"><pre><span></span><code><span class="n">build</span><span class="o">:</span>
 <span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">build</span>
 <span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">stable</span>
@@ -62,20 +62,27 @@
 </code></pre></div>
 
 <p>In our first example, we can use the documentation provided steps to build our container and push to our container registery with a given name <code>pythonapp-flask</code> for our project.</p>
+<blockquote>
 <p>Our source code for the project is here:
 - <a href="https://gitlab.com/mholzinger/containerbuilding">containerbuilding</a></p>
 <p>A project job history can be tracked at:
 -  <a href="https://gitlab.com/mholzinger/containerbuilding/-/pipelines">containerbuilding/-/pipelines</a></p>
-<p><img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: 2px dashed gray;" /></p>
+</blockquote>
+<p><img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
 <hr>
 <h1>] Speeding things up</h1>
 <p>While the above example only took 52 seconds on average, we can trim even that process down to less than half the time by replacing our docker job with <a href="https://github.com/GoogleContainerTools/kaniko">Kaniko</a></p>
 <p>Our replaced job logic for our gitlab pipeline uses the kaniko executor project, which has a remarkable extensibility for replacing multiple Docker steps with one stage using the kaniko executor.</p>
 <h4>Step one ]</h4>
-<p>Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a <code>docker login</code> command. For our example, we are writing the config.json step ourself and storing in out /kaniko/.docker/ path.</p>
-<p>We call this step in the <code>before_script</code> step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time be calling to the registry and then writing out a file.</p>
+<p>Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a <code>docker login</code> command. For our example, we are writing the config.json step using bash redirection and storing in our /kaniko/.docker/ path.</p>
+<div class="highlight"><pre><span></span><code>echo \
+&quot;{\&quot;auths\&quot;:{\&quot;$CI_REGISTRY\&quot;:{\&quot;username\&quot;:\&quot;$CI_REGISTRY_USER\&quot;,\&quot;password\&quot;:\&quot;$CI_REGISTRY_PASSWORD\&quot;}}}&quot; \
+<span class="k">&gt; </span><span class="ge">/kaniko/.docker/config.json</span>
+</code></pre></div>
+
+<p>We call this step in the <code>before_script</code> step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time by calling to the container artifact registry and then writing out a file.</p>
 <h4>Step two ]</h4>
-<p>What's happening in the next step, <code>script:</code> is having the gitlab runnner call the <code>kaniko/executor</code> with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.</p>
+<p>The next next step, <code>script:</code> is invoking a call to <code>kaniko/executor</code> with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.</p>
 <p>We are replacing two previous docker steps, <code>docker build</code> and <code>docker push</code> with one command.</p>
 <div class="highlight"><pre><span></span><code><span class="n">stages</span><span class="p">:</span>
 <span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">build</span>
@@ -97,13 +104,13 @@
 </code></pre></div>
 
 <p>Let's see this in action.</p>
-<p><img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: 2px dashed gray;" /></p>
-<p>In the above example our time to build and deploy was dropped down to just 23 seconds!</p>
+<p><img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>Summary: In the above example our time to build and deploy was dropped down to just 23 seconds!</p>
 <hr>
 <h1>] Executing stages side by side</h1>
 <p>Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.</p>
-<p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: 2px dashed gray;" /></p>
-<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and one one network operation from the gitlab runner to publish to the artifact registry.</p>
+<p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and reducing cost to one network operation from the gitlab runner to publish to the artifact registry.</p>
     </div><!-- /.entry-content -->
 
   </article>
