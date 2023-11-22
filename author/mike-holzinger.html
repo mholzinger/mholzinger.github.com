@@ -13,15 +13,14 @@
                 <h1><a href="../">Mike Holzinger</a></h1>
                 <nav><ul>
                     <li><a href="../category/gitlab-ci.html">Gitlab CI</a></li>
-                    <li><a href="../category/google-cloud-platform.html">Google Cloud Platform</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="../gitlab-ci-targeting-branch-work-stream.html">Gitlab CI targeting branch work stream</a></h1>
+                    <h1 class="entry-title"><a href="../breaking-out-of-docker.html">Breaking out of the traditional Docker model in Gitlab</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2023-11-05T10:40:00-05:00">
+        <abbr class="published" title="2023-11-05T10:20:00-05:00">
                 Published: Sun 05 November 2023
         </abbr>
 
@@ -30,86 +29,90 @@
         </address>
 <p>In <a href="../category/gitlab-ci.html">Gitlab CI</a>.</p>
 
-</footer><!-- /.post-info --><h1>Gitlab CI targeting branch work stream</h1>                </article>
+</footer><!-- /.post-info --><p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
+<p>Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation:</em></strong> <a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html">Use Docker to build Docker images</a></p>
+<p>As a project's complexity gradually increases, this adds additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
+<hr>
+<h1>] Our first pipeline commit job</h1>
+<p>An example below is using a docker image we will call <code>pythonapp-flask</code> being built using dind, first then repeating the same steps using a build using kaniko.</p>
+<div class="highlight"><pre><span></span><code><span class="n">build</span><span class="o">:</span>
+<span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">build</span>
+<span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">stable</span>
+<span class="w">  </span><span class="n">services</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">dind</span>
+<span class="w">  </span><span class="n">variables</span><span class="o">:</span>
+<span class="w">    </span><span class="n">DOCKER_HOST</span><span class="o">:</span><span class="w"> </span><span class="n">tcp</span><span class="o">://</span><span class="n">docker</span><span class="o">:</span><span class="mi">2375</span>
+<span class="w">    </span><span class="n">DOCKER_DRIVER</span><span class="o">:</span><span class="w"> </span><span class="n">overlay2</span>
+<span class="w">    </span><span class="n">IMAGE_NAME</span><span class="o">:</span><span class="w"> </span><span class="n">registry</span><span class="o">.</span><span class="na">gitlab</span><span class="o">.</span><span class="na">com</span><span class="sr">/${CI_PROJECT_PATH}/</span><span class="n">pythonapp</span><span class="o">-</span><span class="n">flask</span>
+
+<span class="w">  </span><span class="n">before_script</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">login</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="n">$CI_REGISTRY_USER</span><span class="w"> </span><span class="o">-</span><span class="n">p</span><span class="w"> </span><span class="n">$CI_REGISTRY_PASSWORD</span><span class="w"> </span><span class="n">$CI_REGISTRY</span>
+
+<span class="w">  </span><span class="n">script</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="o">-</span><span class="n">t</span><span class="w"> </span><span class="n">$IMAGE_NAME</span><span class="w"> </span><span class="o">.</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">push</span><span class="w"> </span><span class="n">$IMAGE_NAME</span>
+</code></pre></div>
+
+<p>In our first example, we can use the documentation provided steps to build our container and push to our container registery with a given name <code>pythonapp-flask</code> for our project.</p>
+<blockquote>
+<p>Our source code for the project is here:
+- <a href="https://gitlab.com/mholzinger/containerbuilding">containerbuilding</a></p>
+<p>A project job history can be tracked at:
+-  <a href="https://gitlab.com/mholzinger/containerbuilding/-/pipelines">containerbuilding/-/pipelines</a></p>
+</blockquote>
+<p><img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<hr>
+<h1>] Speeding things up</h1>
+<p>While the above example only took 52 seconds on average, we can trim even that process down to less than half the time by replacing our docker job with <a href="https://github.com/GoogleContainerTools/kaniko">Kaniko</a></p>
+<p>Our replaced job logic for our gitlab pipeline uses the kaniko executor project, which has a remarkable extensibility for replacing multiple Docker steps with one stage using the kaniko executor.</p>
+<h4>Step one ]</h4>
+<p>Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a <code>docker login</code> command. For our example, we are writing the config.json step using bash redirection and storing in our /kaniko/.docker/ path.</p>
+<div class="highlight"><pre><span></span><code>echo \
+&quot;{\&quot;auths\&quot;:{\&quot;$CI_REGISTRY\&quot;:{\&quot;username\&quot;:\&quot;$CI_REGISTRY_USER\&quot;,\&quot;password\&quot;:\&quot;$CI_REGISTRY_PASSWORD\&quot;}}}&quot; \
+<span class="k">&gt; </span><span class="ge">/kaniko/.docker/config.json</span>
+</code></pre></div>
+
+<p>We call this step in the <code>before_script</code> step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time by calling to the container artifact registry and then writing out a file.</p>
+<h4>Step two ]</h4>
+<p>The next next step, <code>script:</code> is invoking a call to <code>kaniko/executor</code> with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.</p>
+<p>We are replacing two previous docker steps, <code>docker build</code> and <code>docker push</code> with one command.</p>
+<div class="highlight"><pre><span></span><code><span class="n">stages</span><span class="p">:</span>
+<span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">build</span>
+
+<span class="n">build</span><span class="p">:</span>
+<span class="w">  </span><span class="n">stage</span><span class="p">:</span><span class="w"> </span><span class="n">build</span>
+<span class="w">  </span><span class="n">image</span><span class="p">:</span>
+<span class="w">    </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="n">gcr</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">kaniko</span><span class="o">-</span><span class="n">project</span><span class="o">/</span><span class="n">executor</span><span class="p">:</span><span class="n">debug</span>
+<span class="w">    </span><span class="n">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="n">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="n">DOCKER_CONFIG</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span>
+<span class="w">  </span><span class="n">before_script</span><span class="p">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">auths</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">username</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_USER</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">password</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_PASSWORD</span><span class="se">\&quot;</span><span class="s2">}}}&quot;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">json</span>
+<span class="w">  </span><span class="n">script</span><span class="p">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span>
+<span class="w">      </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/</span><span class="n">executor</span><span class="w"> </span><span class="o">--</span><span class="n">context</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="w"> </span>
+<span class="w">      </span><span class="o">--</span><span class="n">dockerfile</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="o">/</span><span class="n">Dockerfile</span><span class="w"> </span>
+<span class="w">      </span><span class="o">--</span><span class="n">destination</span><span class="w"> </span><span class="o">$</span><span class="n">CI_REGISTRY_IMAGE</span><span class="p">:</span><span class="o">$</span><span class="n">CI_COMMIT_REF_SLUG</span>
+</code></pre></div>
+
+<p>Let's see this in action.</p>
+<p><img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>Summary: In the above example our time to build and deploy was dropped down to just 23 seconds!</p>
+<hr>
+<h1>] Executing stages side by side</h1>
+<p>Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.</p>
+<p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and reducing cost to one network operation from the gitlab runner to publish to the artifact registry.</p>                </article>
             </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="../scheduling-gcp-database-exports.html" rel="bookmark"
-                           title="Permalink to Scheduling GCP Database exports">Scheduling GCP Database exports</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-11-05T10:20:00-05:00">
-                Published: Sun 05 November 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="../author/mike-holzinger.html">Mike Holzinger</a>
-        </address>
-<p>In <a href="../category/google-cloud-platform.html">Google Cloud Platform</a>.</p>
-
-</footer><!-- /.post-info -->                <h1>Scheduling GCP Database exports</h1>
-                <a class="readmore" href="../scheduling-gcp-database-exports.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="../speeding-up-docker-builds-with-kaniko.html" rel="bookmark"
-                           title="Permalink to Speeding up Docker builds with Kaniko">Speeding up Docker builds with Kaniko</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-11-05T10:20:00-05:00">
-                Published: Sun 05 November 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="../author/mike-holzinger.html">Mike Holzinger</a>
-        </address>
-<p>In <a href="../category/gitlab-ci.html">Gitlab CI</a>.</p>
-
-</footer><!-- /.post-info -->                <h1>Gitlab CI building with Kaniko</h1>
-                <a class="readmore" href="../speeding-up-docker-builds-with-kaniko.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="../understanding-gitlab-pipeline-syntax.html" rel="bookmark"
-                           title="Permalink to Understanding Gitlab Pipeline Syntax">Understanding Gitlab Pipeline Syntax</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-11-05T10:20:00-05:00">
-                Published: Sun 05 November 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="../author/mike-holzinger.html">Mike Holzinger</a>
-        </address>
-<p>In <a href="../category/gitlab-ci.html">Gitlab CI</a>.</p>
-
-</footer><!-- /.post-info -->                <h1>Gitlab CI building with Kaniko</h1>
-                <a class="readmore" href="../understanding-gitlab-pipeline-syntax.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
                         <ul>
-                            <li><a href="Resume.pdf">Resume</a></li>
-                            <li><a href=""></a></li>
+                            <li><a href="/pdf/Resume - Mike Holzinger (Brooklyn, NY).pdf">Resume</a></li>
+                            <li><a href="https://github.com/mholzinger?tab=repositories">GitHub</a></li>
+                            <li><a href="https://gitlab.com/users/mholzinger/projects">GitLab</a></li>
+                            <li><a href="https://calendly.com/mikeholzinger">Calendly</a></li>
                         </ul>
                 </div><!-- /.blogroll -->
                 <div class="social">
@@ -117,19 +120,10 @@
                         <ul>
 
                             <li><a href="http://www.linkedin.com/in/mikeholzinger/">LinkedIn</a></li>
-                            <li><a href="https://github.com/mholzinger?tab=repositories">GitHub</a></li>
-                            <li><a href="https://gitlab.com/users/mholzinger/projects">GitLab</a></li>
+                            <li><a href=""></a></li>
                         </ul>
                 </div><!-- /.social -->
         </section><!-- /#extras -->
-
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
-
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
 </body>
 </html>
