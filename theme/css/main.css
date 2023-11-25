@@ -1,472 +1,944 @@
 /*
+tom.xml
 	Name: Smashing HTML5
+tom.xml
 	Date: July 2009
+tom.xml
 	Description: Sample layout for HTML5 and CSS3 goodness.
+tom.xml
 	Version: 1.0
+tom.xml
 	License: MIT <https://opensource.org/licenses/MIT>
+tom.xml
 	Licensed by: Smashing Media GmbH <https://www.smashingmagazine.com/>
+tom.xml
 	Original author: Enrique Ramírez <http://enrique-ramirez.com/>
+tom.xml
 */
+tom.xml
 
+tom.xml
 /* Imports */
+tom.xml
 @import url("reset.css");
+tom.xml
 @import url("pygment.css");
+tom.xml
 @import url("typogrify.css");
+tom.xml
 @import url("fonts.css");
+tom.xml
 
+tom.xml
 /***** Global *****/
+tom.xml
 /* Body */
+tom.xml
 body {
+tom.xml
     background: #F5F4EF;
+tom.xml
     color: #000305;
+tom.xml
     font-size: 87.5%; /* Base font size: 14px */
+tom.xml
     font-family: 'Trebuchet MS', Trebuchet, 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+tom.xml
     line-height: 1.429;
+tom.xml
     margin: 0;
+tom.xml
     padding: 0;
+tom.xml
     text-align: left;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /* Headings */
+tom.xml
 h1 {font-size: 2em }
+tom.xml
 h2 {font-size: 1.571em}	/* 22px */
+tom.xml
 h3 {font-size: 1.429em}	/* 20px */
+tom.xml
 h4 {font-size: 1.286em}	/* 18px */
+tom.xml
 h5 {font-size: 1.143em}	/* 16px */
+tom.xml
 h6 {font-size: 1em}		/* 14px */
+tom.xml
 
+tom.xml
 h1, h2, h3, h4, h5, h6 {
+tom.xml
 	font-weight: 400;
+tom.xml
 	line-height: 1.1;
+tom.xml
 	margin-bottom: .8em;
+tom.xml
     font-family: 'Yanone Kaffeesatz', arial, serif;
+tom.xml
 }
+tom.xml
 
+tom.xml
 h3, h4, h5, h6 { margin-top: .8em; }
+tom.xml
 
+tom.xml
 hr { border: 2px solid #EEEEEE; }
+tom.xml
 
+tom.xml
 /* Anchors */
+tom.xml
 a {outline: 0;}
+tom.xml
 a img {border: 0px; text-decoration: none;}
+tom.xml
 a:link, a:visited {
+tom.xml
 	color: #C74350;
+tom.xml
 	padding: 0 1px;
+tom.xml
 	text-decoration: underline;
+tom.xml
 }
+tom.xml
 a:hover, a:active {
+tom.xml
 	background-color: #C74350;
+tom.xml
 	color: #fff;
+tom.xml
 	text-decoration: none;
+tom.xml
 	text-shadow: 1px 1px 1px #333;
+tom.xml
 }
+tom.xml
 
+tom.xml
 h1 a:hover {
+tom.xml
     background-color: inherit
+tom.xml
 }
+tom.xml
 
+tom.xml
 /* Paragraphs */
+tom.xml
 div.line-block,
+tom.xml
 p { margin-top: 1em;
+tom.xml
     margin-bottom: 1em;}
+tom.xml
 
+tom.xml
 strong, b {font-weight: bold;}
+tom.xml
 em, i {font-style: italic;}
+tom.xml
 
+tom.xml
 /* Lists */
+tom.xml
 ul {
+tom.xml
 	list-style: outside disc;
+tom.xml
 	margin: 0em 0 0 1.5em;
+tom.xml
 }
+tom.xml
 
+tom.xml
 ol {
+tom.xml
 	list-style: outside decimal;
+tom.xml
 	margin: 0em 0 0 1.5em;
+tom.xml
 }
+tom.xml
 
+tom.xml
 li { margin-top: 0.5em;
+tom.xml
      margin-bottom: 1em; }
+tom.xml
 
+tom.xml
 .post-info {
+tom.xml
     float:right;
+tom.xml
     margin:10px;
+tom.xml
     padding:5px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 .post-info p{
+tom.xml
     margin-top: 1px;
+tom.xml
     margin-bottom: 1px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 .readmore { float: right }
+tom.xml
 
+tom.xml
 dl {margin: 0 0 1.5em 0;}
+tom.xml
 dt {font-weight: bold;}
+tom.xml
 dd {margin-left: 1.5em;}
+tom.xml
 
+tom.xml
 pre{background-color:  rgb(238, 238, 238); padding: 10px; margin: 10px; overflow: auto;}
+tom.xml
 
+tom.xml
 /* Quotes */
+tom.xml
 blockquote {
+tom.xml
     margin: 20px;
+tom.xml
     font-style: italic;
+tom.xml
 }
+tom.xml
 cite {}
+tom.xml
 
+tom.xml
 q {}
+tom.xml
 
+tom.xml
 div.note {
+tom.xml
    float: right;
+tom.xml
    margin: 5px;
+tom.xml
    font-size: 85%;
+tom.xml
    max-width: 300px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /* Tables */
+tom.xml
 table {margin: .5em auto 1.5em auto; width: 98%;}
+tom.xml
 
+tom.xml
 	/* Thead */
+tom.xml
 	thead th {padding: .5em .4em; text-align: left;}
+tom.xml
 	thead td {}
+tom.xml
 
+tom.xml
 	/* Tbody */
+tom.xml
 	tbody td {padding: .5em .4em;}
+tom.xml
 	tbody th {}
+tom.xml
 
+tom.xml
 	tbody .alt td {}
+tom.xml
 	tbody .alt th {}
+tom.xml
 
+tom.xml
 	/* Tfoot */
+tom.xml
 	tfoot th {}
+tom.xml
 	tfoot td {}
+tom.xml
 
+tom.xml
 /* HTML5 tags */
+tom.xml
 header, section, footer,
+tom.xml
 aside, nav, article, figure {
+tom.xml
 	display: block;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /***** Layout *****/
+tom.xml
 .body {clear: both; margin: 0 auto; max-width: 800px;}
+tom.xml
 img { max-width: 100%; }
+tom.xml
 img.right, figure.right, div.figure.align-right {
+tom.xml
     float: right;
+tom.xml
     margin: 0 0 2em 2em;
+tom.xml
 }
+tom.xml
 img.left, figure.left, div.figure.align-left {
+tom.xml
     float: left;
+tom.xml
     margin: 0 2em 2em 0;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /* .rst support */
+tom.xml
 div.figure img, figure img {  /* to fill figure exactly */
+tom.xml
     max-width: 100%;
+tom.xml
 }
+tom.xml
 div.figure p.caption, figure p.caption { /* margin provided by figure */
+tom.xml
     margin-top: 0;
+tom.xml
     margin-bottom: 0;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	Header
+tom.xml
 *****************/
+tom.xml
 #banner {
+tom.xml
 	margin: 0 auto;
+tom.xml
 	padding: 0.8em 0 0 0;
+tom.xml
 }
+tom.xml
 
+tom.xml
 	/* Banner */
+tom.xml
 	#banner h1 {
+tom.xml
 		font-size: 3.571em;
+tom.xml
 		line-height: 1.0;
+tom.xml
 		margin-bottom: .3em;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#banner h1 a:link, #banner h1 a:visited {
+tom.xml
 		color: #000305;
+tom.xml
 		display: block;
+tom.xml
 		font-weight: bold;
+tom.xml
 		margin: 0 0 0 .2em;
+tom.xml
 		text-decoration: none;
+tom.xml
 	}
+tom.xml
 	#banner h1 a:hover, #banner h1 a:active {
+tom.xml
 		background: none;
+tom.xml
 		color: #C74350;
+tom.xml
 		text-shadow: none;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#banner h1 strong {font-size: 0.36em; font-weight: normal;}
+tom.xml
 
+tom.xml
 	/* Main Nav */
+tom.xml
 	#banner nav {
+tom.xml
 		background: #000305;
+tom.xml
 		font-size: 1.143em;
+tom.xml
 		overflow: auto;
+tom.xml
 		line-height: 30px;
+tom.xml
 		margin: 0 auto 2em auto;
+tom.xml
 		padding: 0;
+tom.xml
 		text-align: center;
+tom.xml
 		max-width: 800px;
+tom.xml
 
+tom.xml
 		border-radius: 5px;
+tom.xml
 		-moz-border-radius: 5px;
+tom.xml
 		-webkit-border-radius: 5px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#banner nav ul {list-style: none; margin: 0 auto; max-width: 800px;}
+tom.xml
 	#banner nav li {float: left; display: inline; margin: 0;}
+tom.xml
 
+tom.xml
 	#banner nav a:link, #banner nav a:visited {
+tom.xml
 		color: #fff;
+tom.xml
 		display: inline-block;
+tom.xml
 		height: 30px;
+tom.xml
 		padding: 5px 1.5em;
+tom.xml
 		text-decoration: none;
+tom.xml
 	}
+tom.xml
 	#banner nav a:hover, #banner nav a:active,
+tom.xml
 	#banner nav .active a:link, #banner nav .active a:visited {
+tom.xml
 		background: #C74451;
+tom.xml
 		color: #fff;
+tom.xml
 		text-shadow: none !important;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#banner nav li:first-child a {
+tom.xml
 		border-top-left-radius: 5px;
+tom.xml
 		-moz-border-radius-topleft: 5px;
+tom.xml
 		-webkit-border-top-left-radius: 5px;
+tom.xml
 
+tom.xml
 		border-bottom-left-radius: 5px;
+tom.xml
 		-moz-border-radius-bottomleft: 5px;
+tom.xml
 		-webkit-border-bottom-left-radius: 5px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	Featured
+tom.xml
 *****************/
+tom.xml
 #featured {
+tom.xml
 	background: #fff;
+tom.xml
 	margin-bottom: 2em;
+tom.xml
 	overflow: hidden;
+tom.xml
 	padding: 20px;
+tom.xml
 	max-width: 760px;
+tom.xml
 
+tom.xml
 	border-radius: 10px;
+tom.xml
 	-moz-border-radius: 10px;
+tom.xml
 	-webkit-border-radius: 10px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 #featured figure {
+tom.xml
 	border: 2px solid #eee;
+tom.xml
 	float: right;
+tom.xml
 	margin: 0.786em 2em 0 5em;
+tom.xml
 	max-width: 248px;
+tom.xml
 }
+tom.xml
 #featured figure img {display: block; float: right;}
+tom.xml
 
+tom.xml
 #featured h2 {color: #C74451; font-size: 1.714em; margin-bottom: 0.333em;}
+tom.xml
 #featured h3 {font-size: 1.429em; margin-bottom: .5em;}
+tom.xml
 
+tom.xml
 #featured h3 a:link, #featured h3 a:visited {color: #000305; text-decoration: none;}
+tom.xml
 #featured h3 a:hover, #featured h3 a:active {color: #fff;}
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	Body
+tom.xml
 *****************/
+tom.xml
 #content {
+tom.xml
 	background: #fff;
+tom.xml
 	margin-bottom: 2em;
+tom.xml
 	overflow: hidden;
+tom.xml
 	padding: 20px 20px;
+tom.xml
 	max-width: 760px;
+tom.xml
 
+tom.xml
 	border-radius: 10px;
+tom.xml
 	-moz-border-radius: 10px;
+tom.xml
 	-webkit-border-radius: 10px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	Extras
+tom.xml
 *****************/
+tom.xml
 #extras {margin: 0 auto 3em auto; overflow: hidden;}
+tom.xml
 
+tom.xml
 #extras ul {list-style: none; margin: 0;}
+tom.xml
 #extras li {border-bottom: 1px solid #fff;}
+tom.xml
 #extras h2 {
+tom.xml
 	color: #C74350;
+tom.xml
 	font-size: 1.429em;
+tom.xml
 	margin-bottom: .25em;
+tom.xml
 	padding: 0 3px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 #extras a:link, #extras a:visited {
+tom.xml
 	color: #444;
+tom.xml
 	display: block;
+tom.xml
 	border-bottom: 1px solid #F4E3E3;
+tom.xml
 	text-decoration: none;
+tom.xml
 	padding: .3em .25em;
+tom.xml
 }
+tom.xml
 
+tom.xml
 #extras a:hover, #extras a:active {color: #fff;}
+tom.xml
 
+tom.xml
 	/* Blogroll */
+tom.xml
 	#extras .blogroll {
+tom.xml
 		float: left;
+tom.xml
 		max-width: 615px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#extras .blogroll li {float: left; margin: 0 20px 0 0; max-width: 185px;}
+tom.xml
 
+tom.xml
 	/* Social */
+tom.xml
 	#extras .social {
+tom.xml
 		float: right;
+tom.xml
 		max-width: 175px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#extras div[class='social'] a {
+tom.xml
 		background-repeat: no-repeat;
+tom.xml
 		background-position: 3px 6px;
+tom.xml
 		padding-left: 25px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 		/* Icons */
+tom.xml
 		.social a[href*='about.me'] {background-image: url('../images/icons/aboutme.png');}
+tom.xml
 		.social a[href*='bitbucket.org'] {background-image: url('../images/icons/bitbucket.png');}
+tom.xml
 		.social a[href*='delicious.com'] {background-image: url('../images/icons/delicious.png');}
+tom.xml
 		.social a[href*='facebook.com'] {background-image: url('../images/icons/facebook.png');}
+tom.xml
 		.social a[href*='gitorious.org'] {background-image: url('../images/icons/gitorious.png');}
+tom.xml
 		.social a[href*='github.com'],
+tom.xml
 		.social a[href*='git.io'] {
+tom.xml
 			background-image: url('../images/icons/github.png');
+tom.xml
 			background-size: 16px 16px;
+tom.xml
 		}
+tom.xml
 		.social a[href*='gittip.com'] {background-image: url('../images/icons/gittip.png');}
+tom.xml
 		.social a[href*='plus.google.com'] {background-image: url('../images/icons/google-plus.png');}
+tom.xml
 		.social a[href*='groups.google.com'] {background-image: url('../images/icons/google-groups.png');}
+tom.xml
 		.social a[href*='news.ycombinator.com'],
+tom.xml
 		.social a[href*='hackernewsers.com'] {background-image: url('../images/icons/hackernews.png');}
+tom.xml
 		.social a[href*='last.fm'], .social a[href*='lastfm.'] {background-image: url('../images/icons/lastfm.png');}
+tom.xml
 		.social a[href*='linkedin.com'] {background-image: url('../images/icons/linkedin.png');}
+tom.xml
 		.social a[href*='reddit.com'] {background-image: url('../images/icons/reddit.png');}
+tom.xml
 		.social a[type$='atom+xml'], .social a[type$='rss+xml'] {background-image: url('../images/icons/rss.png');}
+tom.xml
 		.social a[href*='slideshare.net'] {background-image: url('../images/icons/slideshare.png');}
+tom.xml
 		.social a[href*='speakerdeck.com'] {background-image: url('../images/icons/speakerdeck.png');}
+tom.xml
 		.social a[href*='stackoverflow.com'] {background-image: url('../images/icons/stackoverflow.png');}
+tom.xml
 		.social a[href*='twitter.com'] {background-image: url('../images/icons/twitter.png');}
+tom.xml
 		.social a[href*='vimeo.com'] {background-image: url('../images/icons/vimeo.png');}
+tom.xml
 		.social a[href*='youtube.com'] {background-image: url('../images/icons/youtube.png');}
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	About
+tom.xml
 *****************/
+tom.xml
 #about {
+tom.xml
 	background: #fff;
+tom.xml
 	font-style: normal;
+tom.xml
 	margin-bottom: 2em;
+tom.xml
 	overflow: hidden;
+tom.xml
 	padding: 20px;
+tom.xml
 	text-align: left;
+tom.xml
 	max-width: 760px;
+tom.xml
 
+tom.xml
 	border-radius: 10px;
+tom.xml
 	-moz-border-radius: 10px;
+tom.xml
 	-webkit-border-radius: 10px;
+tom.xml
 }
+tom.xml
 
+tom.xml
 #about .primary {float: left; max-width: 165px;}
+tom.xml
 #about .primary strong {color: #C64350; display: block; font-size: 1.286em;}
+tom.xml
 #about .photo {float: left; margin: 5px 20px;}
+tom.xml
 
+tom.xml
 #about .url:link, #about .url:visited {text-decoration: none;}
+tom.xml
 
+tom.xml
 #about .bio {float: right; max-width: 500px;}
+tom.xml
 
+tom.xml
 /*
+tom.xml
 	Footer
+tom.xml
 *****************/
+tom.xml
 #contentinfo {padding-bottom: 2em; text-align: right;}
+tom.xml
 
+tom.xml
 /***** Sections *****/
+tom.xml
 /* Blog */
+tom.xml
 .hentry {
+tom.xml
 	display: block;
+tom.xml
 	clear: both;
+tom.xml
 	border-top: 1px solid #eee;
+tom.xml
 	padding: 1.5em 0;
+tom.xml
 }
+tom.xml
 li:first-child .hentry, #content > .hentry {border: 0; margin: 0;}
+tom.xml
 #content > .hentry {padding: 1em 0;}
+tom.xml
 .hentry img{display : none ;}
+tom.xml
 .entry-title {font-size: 3em; margin-bottom: 10px; margin-top: 0;}
+tom.xml
 .entry-title a:link, .entry-title a:visited {text-decoration: none; color: #333;}
+tom.xml
 .entry-title a:visited {background-color: #fff;}
+tom.xml
 
+tom.xml
 .hentry .post-info * {font-style: normal;}
+tom.xml
 
+tom.xml
 	/* Content */
+tom.xml
 	.hentry footer {margin-bottom: 2em;}
+tom.xml
 	.hentry footer address {display: inline;}
+tom.xml
 	#posts-list footer address {display: block;}
+tom.xml
 
+tom.xml
 	/* Blog Index */
+tom.xml
 	#posts-list {list-style: none; margin: 0;}
+tom.xml
 	#posts-list .hentry {padding-left: 10px; position: relative;}
+tom.xml
 
+tom.xml
 	#posts-list footer {
+tom.xml
 		left: 10px;
+tom.xml
 		position: relative;
+tom.xml
         float: left;
+tom.xml
 		top: 0.5em;
+tom.xml
 		max-width: 190px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	/* About the Author */
+tom.xml
 	#about-author {
+tom.xml
 		background: #f9f9f9;
+tom.xml
 		clear: both;
+tom.xml
 		font-style: normal;
+tom.xml
 		margin: 2em 0;
+tom.xml
 		padding: 10px 20px 15px 20px;
+tom.xml
 
+tom.xml
 		border-radius: 5px;
+tom.xml
 		-moz-border-radius: 5px;
+tom.xml
 		-webkit-border-radius: 5px;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#about-author strong {
+tom.xml
 		color: #C64350;
+tom.xml
 		clear: both;
+tom.xml
 		display: block;
+tom.xml
 		font-size: 1.429em;
+tom.xml
 	}
+tom.xml
 
+tom.xml
 	#about-author .photo {border: 1px solid #ddd; float: left; margin: 5px 1em 0 0;}
+tom.xml
 
+tom.xml
 	/* Comments */
+tom.xml
 	#comments-list {list-style: none; margin: 0 1em;}
+tom.xml
 	#comments-list blockquote {
+tom.xml
 		background: #f8f8f8;
+tom.xml
 		clear: both;
+tom.xml
 		font-style: normal;
+tom.xml
 		margin: 0;
+tom.xml
 		padding: 15px 20px;
+tom.xml
 
+tom.xml
 		border-radius: 5px;
+tom.xml
 		-moz-border-radius: 5px;
+tom.xml
 		-webkit-border-radius: 5px;
+tom.xml
 	}
+tom.xml
 	#comments-list footer {color: #888; padding: .5em 1em 0 0; text-align: right;}
+tom.xml
 
+tom.xml
 	#comments-list li:nth-child(2n) blockquote {background: #F5f5f5;}
+tom.xml
 
+tom.xml
 	/* Add a Comment */
+tom.xml
 	#add-comment label {clear: left; float: left; text-align: left; max-width: 150px;}
+tom.xml
 	#add-comment input[type='text'],
+tom.xml
 	#add-comment input[type='email'],
+tom.xml
 	#add-comment input[type='url'] {float: left; max-width: 200px;}
+tom.xml
 
+tom.xml
 	#add-comment textarea {float: left; height: 150px; max-width: 495px;}
+tom.xml
 
+tom.xml
 	#add-comment p.req {clear: both; margin: 0 .5em 1em 0; text-align: right;}
+tom.xml
 
+tom.xml
 	#add-comment input[type='submit'] {float: right; margin: 0 .5em;}
+tom.xml
 	#add-comment * {margin-bottom: .5em;}
+tom.xml

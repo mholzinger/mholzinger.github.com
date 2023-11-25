@@ -1,140 +1,280 @@
 <!DOCTYPE html>
+tom.xml
 <html lang="en">
+tom.xml
 <head>
+tom.xml
         <meta charset="utf-8" />
+tom.xml
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+tom.xml
         <meta name="generator" content="Pelican" />
+tom.xml
         <title>Breaking out of the traditional Docker model in Gitlab</title>
+tom.xml
         <link rel="stylesheet" href="https://cipherpop.com/theme/css/main.css" />
+tom.xml
         <meta name="description" content="Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a..." />
+tom.xml
 </head>
+tom.xml
 
+tom.xml
 <body id="index" class="home">
+tom.xml
         <header id="banner" class="body">
+tom.xml
                 <h1><a href="https://cipherpop.com/">Mike Holzinger</a></h1>
+tom.xml
                 <nav><ul>
+tom.xml
                     <li class="active"><a href="https://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a></li>
+tom.xml
                     <li><a href="https://cipherpop.com/category/security.html">Security</a></li>
+tom.xml
                 </ul></nav>
+tom.xml
         </header><!-- /#banner -->
+tom.xml
 <section id="content" class="body">
+tom.xml
   <article>
+tom.xml
     <header>
+tom.xml
       <h1 class="entry-title">
+tom.xml
         <a href="https://cipherpop.com/breaking-out-of-docker.html" rel="bookmark"
+tom.xml
            title="Permalink to Breaking out of the traditional Docker model in Gitlab">Breaking out of the traditional Docker model in Gitlab</a></h1>
+tom.xml
     </header>
+tom.xml
 
+tom.xml
     <div class="entry-content">
+tom.xml
 <footer class="post-info">
+tom.xml
         <abbr class="published" title="2023-11-05T10:20:00-05:00">
+tom.xml
                 Published: Sun 05 November 2023
+tom.xml
         </abbr>
+tom.xml
 
+tom.xml
         <address class="vcard author">
+tom.xml
                 By                         <a class="url fn" href="https://cipherpop.com/author/mike-holzinger.html">Mike Holzinger</a>
+tom.xml
         </address>
+tom.xml
 <p>In <a href="https://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a>.</p>
+tom.xml
 
+tom.xml
 </footer><!-- /.post-info -->      <p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
+tom.xml
 <p>Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.</p>
+tom.xml
 <p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation:</em></strong> <a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html">Use Docker to build Docker images</a></p>
+tom.xml
 <p>As a project's complexity gradually increases, this adds additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
+tom.xml
 <hr>
+tom.xml
 <h1>] Our first pipeline commit job</h1>
+tom.xml
 <p>An example below is using a docker image we will call <code>pythonapp-flask</code> being built using dind, first then repeating the same steps using a build using kaniko.</p>
+tom.xml
 <div class="highlight"><pre><span></span><code><span class="n">build</span><span class="o">:</span>
+tom.xml
 <span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">build</span>
+tom.xml
 <span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">stable</span>
+tom.xml
 <span class="w">  </span><span class="n">services</span><span class="o">:</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">dind</span>
+tom.xml
 <span class="w">  </span><span class="n">variables</span><span class="o">:</span>
+tom.xml
 <span class="w">    </span><span class="n">DOCKER_HOST</span><span class="o">:</span><span class="w"> </span><span class="n">tcp</span><span class="o">://</span><span class="n">docker</span><span class="o">:</span><span class="mi">2375</span>
+tom.xml
 <span class="w">    </span><span class="n">DOCKER_DRIVER</span><span class="o">:</span><span class="w"> </span><span class="n">overlay2</span>
+tom.xml
 <span class="w">    </span><span class="n">IMAGE_NAME</span><span class="o">:</span><span class="w"> </span><span class="n">registry</span><span class="o">.</span><span class="na">gitlab</span><span class="o">.</span><span class="na">com</span><span class="sr">/${CI_PROJECT_PATH}/</span><span class="n">pythonapp</span><span class="o">-</span><span class="n">flask</span>
+tom.xml
 
+tom.xml
 <span class="w">  </span><span class="n">before_script</span><span class="o">:</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">login</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="n">$CI_REGISTRY_USER</span><span class="w"> </span><span class="o">-</span><span class="n">p</span><span class="w"> </span><span class="n">$CI_REGISTRY_PASSWORD</span><span class="w"> </span><span class="n">$CI_REGISTRY</span>
+tom.xml
 
+tom.xml
 <span class="w">  </span><span class="n">script</span><span class="o">:</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="o">-</span><span class="n">t</span><span class="w"> </span><span class="n">$IMAGE_NAME</span><span class="w"> </span><span class="o">.</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">push</span><span class="w"> </span><span class="n">$IMAGE_NAME</span>
+tom.xml
 </code></pre></div>
+tom.xml
 
+tom.xml
 <p>In our first example, we can use the documentation provided steps to build our container and push to our container registery with a given name <code>pythonapp-flask</code> for our project.</p>
+tom.xml
 <blockquote>
+tom.xml
 <p>Our source code for the project is here:
+tom.xml
 - <a href="https://gitlab.com/mholzinger/containerbuilding">containerbuilding</a></p>
+tom.xml
 <p>A project job history can be tracked at:
+tom.xml
 -  <a href="https://gitlab.com/mholzinger/containerbuilding/-/pipelines">containerbuilding/-/pipelines</a></p>
+tom.xml
 </blockquote>
+tom.xml
 <p><img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+tom.xml
 <hr>
+tom.xml
 <h1>] Speeding things up</h1>
+tom.xml
 <p>While the above example only took 52 seconds on average, we can trim even that process down to less than half the time by replacing our docker job with <a href="https://github.com/GoogleContainerTools/kaniko">Kaniko</a></p>
+tom.xml
 <p>Our replaced job logic for our gitlab pipeline uses the kaniko executor project, which has a remarkable extensibility for replacing multiple Docker steps with one stage using the kaniko executor.</p>
+tom.xml
 <h4>Step one ]</h4>
+tom.xml
 <p>Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a <code>docker login</code> command. For our example, we are writing the config.json step using bash redirection and storing in our /kaniko/.docker/ path.</p>
+tom.xml
 <div class="highlight"><pre><span></span><code>echo \
+tom.xml
 &quot;{\&quot;auths\&quot;:{\&quot;$CI_REGISTRY\&quot;:{\&quot;username\&quot;:\&quot;$CI_REGISTRY_USER\&quot;,\&quot;password\&quot;:\&quot;$CI_REGISTRY_PASSWORD\&quot;}}}&quot; \
+tom.xml
 <span class="k">&gt; </span><span class="ge">/kaniko/.docker/config.json</span>
+tom.xml
 </code></pre></div>
+tom.xml
 
+tom.xml
 <p>We call this step in the <code>before_script</code> step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time by calling to the container artifact registry and then writing out a file.</p>
+tom.xml
 <h4>Step two ]</h4>
+tom.xml
 <p>The next next step, <code>script:</code> is invoking a call to <code>kaniko/executor</code> with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.</p>
+tom.xml
 <p>We are replacing two previous docker steps, <code>docker build</code> and <code>docker push</code> with one command.</p>
+tom.xml
 <div class="highlight"><pre><span></span><code><span class="n">stages</span><span class="p">:</span>
+tom.xml
 <span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">build</span>
+tom.xml
 
+tom.xml
 <span class="n">build</span><span class="p">:</span>
+tom.xml
 <span class="w">  </span><span class="n">stage</span><span class="p">:</span><span class="w"> </span><span class="n">build</span>
+tom.xml
 <span class="w">  </span><span class="n">image</span><span class="p">:</span>
+tom.xml
 <span class="w">    </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="n">gcr</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">kaniko</span><span class="o">-</span><span class="n">project</span><span class="o">/</span><span class="n">executor</span><span class="p">:</span><span class="n">debug</span>
+tom.xml
 <span class="w">    </span><span class="n">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+tom.xml
 <span class="w">  </span><span class="n">variables</span><span class="p">:</span>
+tom.xml
 <span class="w">    </span><span class="n">DOCKER_CONFIG</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span>
+tom.xml
 <span class="w">  </span><span class="n">before_script</span><span class="p">:</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">auths</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">username</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_USER</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">password</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_PASSWORD</span><span class="se">\&quot;</span><span class="s2">}}}&quot;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">json</span>
+tom.xml
 <span class="w">  </span><span class="n">script</span><span class="p">:</span>
+tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span>
+tom.xml
 <span class="w">      </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/</span><span class="n">executor</span><span class="w"> </span><span class="o">--</span><span class="n">context</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="w"> </span>
+tom.xml
 <span class="w">      </span><span class="o">--</span><span class="n">dockerfile</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="o">/</span><span class="n">Dockerfile</span><span class="w"> </span>
+tom.xml
 <span class="w">      </span><span class="o">--</span><span class="n">destination</span><span class="w"> </span><span class="o">$</span><span class="n">CI_REGISTRY_IMAGE</span><span class="p">:</span><span class="o">$</span><span class="n">CI_COMMIT_REF_SLUG</span>
+tom.xml
 </code></pre></div>
+tom.xml
 
+tom.xml
 <p>Let's see this in action.</p>
+tom.xml
 <p><img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+tom.xml
 <p>Summary: In the above example our time to build and deploy was dropped down to just 23 seconds!</p>
+tom.xml
 <hr>
+tom.xml
 <h1>] Executing stages side by side</h1>
+tom.xml
 <p>Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.</p>
+tom.xml
 <p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+tom.xml
 <p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and reducing cost to one network operation from the gitlab runner to publish to the artifact registry.</p>
+tom.xml
     </div><!-- /.entry-content -->
+tom.xml
 
+tom.xml
   </article>
+tom.xml
 </section>
+tom.xml
         <section id="extras" class="body">
+tom.xml
                 <div class="blogroll">
+tom.xml
                         <h2>links</h2>
+tom.xml
                         <ul>
+tom.xml
                             <li><a href="/pdf/Resume - Mike Holzinger (Brooklyn, NY).pdf">Resume</a></li>
+tom.xml
                             <li><a href="https://github.com/mholzinger?tab=repositories">GitHub</a></li>
+tom.xml
                             <li><a href="https://gitlab.com/users/mholzinger/projects">GitLab</a></li>
+tom.xml
                             <li><a href="https://calendly.com/mikeholzinger">Calendly</a></li>
+tom.xml
                         </ul>
+tom.xml
                 </div><!-- /.blogroll -->
+tom.xml
                 <div class="social">
+tom.xml
                         <h2>social</h2>
+tom.xml
                         <ul>
+tom.xml
                             <li><a href="https://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+tom.xml
 
+tom.xml
                             <li><a href="http://www.linkedin.com/in/mikeholzinger/">LinkedIn</a></li>
+tom.xml
                             <li><a href=""></a></li>
+tom.xml
                         </ul>
+tom.xml
                 </div><!-- /.social -->
+tom.xml
         </section><!-- /#extras -->
+tom.xml
 
+tom.xml
 </body>
+tom.xml
 </html>
+tom.xml
