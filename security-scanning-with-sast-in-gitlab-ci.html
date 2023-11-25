@@ -1,543 +1,273 @@
 <!DOCTYPE html>
-tom.xml
 <html lang="en">
-tom.xml
 <head>
-tom.xml
         <meta charset="utf-8" />
-tom.xml
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-tom.xml
         <meta name="generator" content="Pelican" />
-tom.xml
         <title>Security Scanning with SAST in Gitlab CI</title>
-tom.xml
         <link rel="stylesheet" href="https://cipherpop.com/theme/css/main.css" />
-tom.xml
+        <link href="https://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mike Holzinger Atom Feed" />
         <meta name="description" content="Gitlab offers a comprehensive set of container and security scanning tools which are provided free to gitlab users on every tier, and with..." />
-tom.xml
 </head>
-tom.xml
 
-tom.xml
 <body id="index" class="home">
-tom.xml
         <header id="banner" class="body">
-tom.xml
                 <h1><a href="https://cipherpop.com/">Mike Holzinger</a></h1>
-tom.xml
                 <nav><ul>
-tom.xml
                     <li><a href="https://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a></li>
-tom.xml
                     <li class="active"><a href="https://cipherpop.com/category/security.html">Security</a></li>
-tom.xml
                 </ul></nav>
-tom.xml
         </header><!-- /#banner -->
-tom.xml
 <section id="content" class="body">
-tom.xml
   <article>
-tom.xml
     <header>
-tom.xml
       <h1 class="entry-title">
-tom.xml
         <a href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html" rel="bookmark"
-tom.xml
            title="Permalink to Security Scanning with SAST in Gitlab CI">Security Scanning with SAST in Gitlab CI</a></h1>
-tom.xml
     </header>
-tom.xml
 
-tom.xml
     <div class="entry-content">
-tom.xml
 <footer class="post-info">
-tom.xml
         <abbr class="published" title="2023-11-23T16:27:00-05:00">
-tom.xml
                 Published: Thu 23 November 2023
-tom.xml
         </abbr>
-tom.xml
 
-tom.xml
         <address class="vcard author">
-tom.xml
                 By                         <a class="url fn" href="https://cipherpop.com/author/mike-holzinger.html">Mike Holzinger</a>
-tom.xml
         </address>
-tom.xml
 <p>In <a href="https://cipherpop.com/category/security.html">Security</a>.</p>
-tom.xml
 
-tom.xml
 </footer><!-- /.post-info -->      <p>Gitlab offers a comprehensive set of container and security scanning tools which are provided free to gitlab users on every tier, and with Gitlab's Ultimate tier, also included is set of code vulnerability and security reporting dashboards.</p>
-tom.xml
 <p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation</em></strong>: <a href="https://docs.gitlab.com/ee/user/application_security/sast/">Static Application Security Testing (SAST) 
-tom.xml
 All tiers
-tom.xml
 All offerings
-tom.xml
 </a></p>
-tom.xml
 <p>The scope of this post is to give an example of using the included security scanning tools provided by gitlab first by first posting a small python application with small code vulnerabilities, then introducing a node.js vulnerability.</p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Introduce python web app with weak code security posture</h1>
-tom.xml
 <p>We introduce a python application that uses Flask to host a rest application that returns the python version and the container OS version from a REST GET command.</p>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-tom.xml
 
-tom.xml
 <span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-tom.xml
 <span class="n">def</span><span class="w"> </span><span class="k">index</span><span class="p">()</span><span class="err">:</span>
-tom.xml
 <span class="w">    </span><span class="n">python_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform</span><span class="p">.</span><span class="n">python_version</span><span class="p">()</span>
-tom.xml
 <span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="p">.</span><span class="n">check_output</span><span class="p">(</span><span class="ss">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="k">True</span><span class="p">).</span><span class="n">decode</span><span class="p">()</span>
-tom.xml
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">f</span><span class="ss">&quot;Python Version: {python_version}\nLinux Version:\n{linux_version}&quot;</span>
-tom.xml
 
-tom.xml
 <span class="k">if</span><span class="w"> </span><span class="n">__name__</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;__main__&quot;</span><span class="err">:</span>
-tom.xml
 <span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="k">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <hr>
-tom.xml
 <h1>] Add node depency npm module (express) and configure npm_install pipeline build step</h1>
-tom.xml
 <p>To continue adding to our framework, an NPM dependency <a href="https://www.npmjs.com/package/express"><em>node express</em></a> was added to our project and an additional step in our CI was included to install the NPM step before building our docker container.</p>
-tom.xml
 <div class="highlight"><pre><span></span><code>{
-tom.xml
 <span class="w">  </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;sample-npm-dep&quot;</span>,
-tom.xml
 <span class="w">  </span><span class="s2">&quot;version&quot;</span>:<span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span>,
-tom.xml
 <span class="w">  </span><span class="s2">&quot;description&quot;</span>:<span class="w"> </span><span class="s2">&quot;A sample NPM dependency&quot;</span>,
-tom.xml
 <span class="w">  </span><span class="s2">&quot;main&quot;</span>:<span class="w"> </span><span class="s2">&quot;index.js&quot;</span>,
-tom.xml
 <span class="w">  </span><span class="s2">&quot;scripts&quot;</span>:<span class="w"> </span>{
-tom.xml
 <span class="w">    </span><span class="s2">&quot;test&quot;</span>:<span class="w"> </span><span class="s2">&quot;echo \&quot;</span><span class="nv">Error</span>:<span class="w"> </span><span class="nv">no</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">specified</span>\<span class="s2">&quot; &amp;&amp; exit 1&quot;</span>
-tom.xml
 <span class="w">  </span>},
-tom.xml
 <span class="w">  </span><span class="s2">&quot;dependencies&quot;</span>:<span class="w"> </span>{
-tom.xml
 <span class="w">    </span><span class="s2">&quot;express&quot;</span>:<span class="w"> </span><span class="s2">&quot;^4.17.1&quot;</span>
-tom.xml
 <span class="w">  </span>}
-tom.xml
 }
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <p>Add the dependency step to our Gitlab-CI </p>
-tom.xml
 <p><code>.gitlab-ci.yml</code></p>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="n">npm_install</span><span class="o">:</span>
-tom.xml
 <span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">npm_install</span>
-tom.xml
 <span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">node</span><span class="o">:</span><span class="n">latest</span>
-tom.xml
 <span class="w">  </span><span class="n">script</span><span class="o">:</span>
-tom.xml
 <span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">npm</span><span class="w"> </span><span class="n">install</span>
-tom.xml
 <span class="w">  </span><span class="n">cache</span><span class="o">:</span>
-tom.xml
 <span class="w">    </span><span class="n">paths</span><span class="o">:</span>
-tom.xml
 <span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">node_modules</span><span class="o">/</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <p><img src="/images/SAST-Setup-node-dependency.jpg" alt="Pipeline Job for NPM dependancy" style="border: .5px solid #222222;" /></p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Enable SAST for repository</h1>
-tom.xml
 <p>Items to note:</p>
-tom.xml
 <ul>
-tom.xml
 <li><strong>Pipeline job naming:</strong></li>
-tom.xml
 </ul>
-tom.xml
 <p>To enable and match pipeline jobs for SAST and gitlab security templates, the job step in the gitlab pipeline must be named <code>test:</code> as subsequent templates are defined as children jobs of the test definition </p>
-tom.xml
 <ul>
-tom.xml
 <li><strong>Defining the Include stanza:</strong></li>
-tom.xml
 </ul>
-tom.xml
 <p>Typically these job templates are already included in the first commit to <code>.gitlab-ci.yml</code> and can be included by adding a stanza beginning with an "include" key.</p>
-tom.xml
 <p>Templates will be listed as strings. </p>
-tom.xml
 <div class="highlight"><pre><span></span><code>stages:
-tom.xml
 <span class="k">-</span> npm_install
-tom.xml
 <span class="k">-</span> build
-tom.xml
 <span class="k">-</span> test
-tom.xml
 
-tom.xml
 include:
-tom.xml
   <span class="k">-</span> template: SAST.gitlab-ci.yml
-tom.xml
 
-tom.xml
 sast:
-tom.xml
   stage: test
-tom.xml
   script:
-tom.xml
     <span class="k">-</span> /analyzer run
-tom.xml
   artifacts:
-tom.xml
     reports:
-tom.xml
       sast: gl-sast-report.json
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <hr>
-tom.xml
 <h1>] Running the SAST test job pipeline step against our application code</h1>
-tom.xml
 <p>We've included the basic SAST template. Let's test the output for our python application.</p>
-tom.xml
 <p><img src="/images/SAST-Setup-initial-sast-scan.jpg" alt="Pipeline Job for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <h1>] Understanding how SAST scanning generates reporting artifacts</h1>
-tom.xml
 <p>When we look at our new finished pipeline jobs, we can see two new jobs have finished after including the basic SAST template.</p>
-tom.xml
 <ul>
-tom.xml
 <li>nodejs-scan-sast</li>
-tom.xml
 <li>semgrep-sast</li>
-tom.xml
 </ul>
-tom.xml
 <p>Let's head to to our Artifact repository whihc has been enabled by default by gitlab for this project.</p>
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/artifacts">cipherpop-guidance/containerscanning/-/artifacts</a></li>
-tom.xml
 </ul>
-tom.xml
 <p><img src="/images/SAST-Artifact-generation.jpg" alt="Job Artifcats for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <p>In our SAST pipeline job, we asked for the generated report to output as the <code>gl-sast-report.json</code> to help illustrate our example.</p>
-tom.xml
 <p>This is a default setting that we don't need for our pipeline to run because it's defined in the template we include.</p>
-tom.xml
 <div class="highlight"><pre><span></span><code>sast:
-tom.xml
 
-tom.xml
 ...
-tom.xml
 
-tom.xml
   artifacts:
-tom.xml
     reports:
-tom.xml
       sast: gl-sast-report.json
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <p>Another example of default report names are listed below this explanation.</p>
-tom.xml
 <div class="highlight"><pre><span></span><code>  sast: gl-sast-report.json
-tom.xml
   container_scanning: gl-container-scanning-report.json
-tom.xml
   dependency_scanning: gl-dependency-scanning-report.json
-tom.xml
   cyclonedx: &quot;**/gl-sbom-*.cdx.json&quot;
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <p>To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as json.</p>
-tom.xml
 <p><em>Note</em>: If using the free version of gitlab, the report is always generated and can be interpreted as JSON output and can be fed to a third party SEIM without using the Gitlab Security Dashboard.</p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Project Security Dashboard</h1>
-tom.xml
 <p>Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical, and three vulnerabilities marked as Medium.</p>
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/dashboard">cipherpop-guidance/containerscanning/-/security/dashboard</a></li>
-tom.xml
 </ul>
-tom.xml
 <p><img src="/images/SAST-Security-Dashboard-001.jpg" alt="Security dash for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <p>Let's drill into the details and find out what this dashboard is trying to tell us.</p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Project Vulnerability Dashboard</h1>
-tom.xml
 <p>Drilling into the Vulnerability dashboard, we can see interpreted detail from the <code>gl-sast-report.json</code></p>
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/vulnerability_report">cipherpop-guidance/containerscanning/-/security/vulnerability_report</a></li>
-tom.xml
 </ul>
-tom.xml
 <p><img src="/images/SAST-Vulnerability-Dashboard-001.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <p>We have warnings for lines 3, 10 and 14 of our python server code.</p>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="mi">03</span>    <span class="kn">import</span> <span class="nn">subprocess</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <blockquote>
-tom.xml
 <p>Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')</p>
-tom.xml
 <p>Description: Consider possible security implications associated with subprocess module.</p>
-tom.xml
 <p>Severity: Medium</p>
-tom.xml
 </blockquote>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="mf">10</span><span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="mf">.</span><span class="n">check_output</span><span class="p">(</span><span class="s">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="n">True</span><span class="p">)</span><span class="mf">.</span><span class="n">decode</span><span class="p">()</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <blockquote>
-tom.xml
 <p>Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')</p>
-tom.xml
 <p>Description: Found subprocess function check_output with shell=True. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and
-tom.xml
 variables, which makes it much easier for a malicious actor to execute commands. Use shell=False
-tom.xml
 instead.</p>
-tom.xml
 <p>Severity:  Critical</p>
-tom.xml
 </blockquote>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="mf">14</span><span class="w">    </span><span class="n">app</span><span class="mf">.</span><span class="kr">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="err">&#39;</span><span class="mf">0.0.0.0</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="n">True</span><span class="p">)</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <blockquote>
-tom.xml
 <p>Active debug code</p>
-tom.xml
 <p>Description The Flask application is running with debug=True configured. By enabling this option, certain exceptions or errors could cause sensitive information to be leaked in HTTP responses.
-tom.xml
 Additionally, it is not recommended to run a Flask application using Flask.run(...) in production. Instead, a WSGI server such as gunicorn or waitress be used instead. For more information on deployment options for Flask applications see:</p>
-tom.xml
 <p>https://flask.palletsprojects.com/en/2.3.x/deploying/</p>
-tom.xml
 <p>Severity: Medium</p>
-tom.xml
 </blockquote>
-tom.xml
 <p><strong>] Section summary</strong></p>
-tom.xml
 <p>We see that the Vulnerability dashboard not only reports the offending line, but also gives us a very comprehensive solution identified to resolve the identified issue.</p>
-tom.xml
 <p>To move this part forward, the medium Security issues, using the submodule process and using Flask will stay in our project, but the Critical warning will get resolved. </p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Using the Vulnerability dashboard to Confirm and Resolve issues</h1>
-tom.xml
 <p>We've resolved the outstanding issues and committed a changes to our application.</p>
-tom.xml
 <p>First We can see that our Dashboard shows our resolved status and is asking us to "do something" with the posted alert.</p>
-tom.xml
 <p><img src="/images/SAST-Vulnerability-Dashboard-002.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <p>Next We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.</p>
-tom.xml
 <p><img src="/images/SAST-Vulnerability-Dashboard-003.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Introducing a new vulnerablity with into Node</h1>
-tom.xml
 <p>Let's test adding a node dependancy with known security issues. </p>
-tom.xml
 <div class="highlight"><pre><span></span><code>&quot;lodash&quot;: &quot;4.17.10&quot;
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://security.snyk.io/package/npm/lodash/4.17.10">Known vulnerabilities in the lodash package</a></li>
-tom.xml
 </ul>
-tom.xml
 <p>Enable the following Gitlab security, container and dependancy scanning templates.</p>
-tom.xml
 <p>The $CS_IMAGE variable will also need to be set. </p>
-tom.xml
 <p>Further documentation on setting container scanning variables is hosted here at Gitlab.</p>
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry">Container Scanning - Scan an image in a remote registry</a></li>
-tom.xml
 </ul>
-tom.xml
 <div class="highlight"><pre><span></span><code><span class="n">variables</span><span class="o">:</span>
-tom.xml
 <span class="w">  </span><span class="n">CS_IMAGE</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;registry.gitlab.com/cipherpop-guidance/containerscanning:main&quot;</span>
-tom.xml
 
-tom.xml
 <span class="k">include</span><span class="o">:</span>
-tom.xml
 
-tom.xml
 <span class="w">  </span><span class="o">...</span>
-tom.xml
 
-tom.xml
 <span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Dependency</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
-tom.xml
 <span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Container</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
-tom.xml
 </code></pre></div>
-tom.xml
 
-tom.xml
 <ul>
-tom.xml
 <li><a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security">gitlab/ci/templates/Security</a></li>
-tom.xml
 </ul>
-tom.xml
 <p><img src="/images/SAST-Vulnerability-Dashboard-004.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-tom.xml
 <hr>
-tom.xml
 <h1>] Summary</h1>
-tom.xml
 <p>Gitlab SAST, Container Security and Dependancy scanning are powerful tools, available to to all tiers.</p>
-tom.xml
 <p>Further discussion on this topic will include</p>
-tom.xml
 <ul>
-tom.xml
 <li>External SIEM integation</li>
-tom.xml
 <li>Remediation, Escalation</li>
-tom.xml
 </ul>
-tom.xml
     </div><!-- /.entry-content -->
-tom.xml
 
-tom.xml
   </article>
-tom.xml
 </section>
-tom.xml
         <section id="extras" class="body">
-tom.xml
                 <div class="blogroll">
-tom.xml
                         <h2>links</h2>
-tom.xml
                         <ul>
-tom.xml
                             <li><a href="/pdf/Resume - Mike Holzinger (Brooklyn, NY).pdf">Resume</a></li>
-tom.xml
                             <li><a href="https://github.com/mholzinger?tab=repositories">GitHub</a></li>
-tom.xml
                             <li><a href="https://gitlab.com/users/mholzinger/projects">GitLab</a></li>
-tom.xml
                             <li><a href="https://calendly.com/mikeholzinger">Calendly</a></li>
-tom.xml
                         </ul>
-tom.xml
                 </div><!-- /.blogroll -->
-tom.xml
                 <div class="social">
-tom.xml
                         <h2>social</h2>
-tom.xml
                         <ul>
-tom.xml
-tom.xml
+                            <li><a href="https://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
 
-tom.xml
                             <li><a href="http://www.linkedin.com/in/mikeholzinger/">LinkedIn</a></li>
-tom.xml
                             <li><a href=""></a></li>
-tom.xml
                         </ul>
-tom.xml
                 </div><!-- /.social -->
-tom.xml
         </section><!-- /#extras -->
-tom.xml
 
-tom.xml
 </body>
-tom.xml
 </html>
-tom.xml
