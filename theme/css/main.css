@@ -696,7 +696,6 @@ tom.xml
 tom.xml
 		.social a[href*='reddit.com'] {background-image: url('../images/icons/reddit.png');}
 tom.xml
-		.social a[type$='atom+xml'], .social a[type$='rss+xml'] {background-image: url('../images/icons/rss.png');}
 tom.xml
 		.social a[href*='slideshare.net'] {background-image: url('../images/icons/slideshare.png');}
 tom.xml
