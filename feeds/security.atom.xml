@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Mike Holzinger - Security</title><link href="https://cipherpop.com/" rel="alternate"></link><link href="https://cipherpop.com/feeds/security.atom.xml" rel="self"></link><id>https://cipherpop.com/</id><updated>2023-11-23T16:27:00-05:00</updated><entry><title>Security Scanning with SAST in Gitlab CI</title><link href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html" rel="alternate"></link><published>2023-11-23T16:27:00-05:00</published><updated>2023-11-23T16:27:00-05:00</updated><author><name>Mike Holzinger</name></author><id>tag:cipherpop.com,2023-11-23:/security-scanning-with-sast-in-gitlab-ci.html</id><summary type="html">&lt;p&gt;Gitlab offers a comprehensive set of container and security scanning tools which are provided free to gitlab users on every tier, and with Gitlab's Ultimate tier, also included is set of code vulnerability and security reporting dashboards.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Mike Holzinger - Security</title><link href="https://cipherpop.com/" rel="alternate"></link><link href="https://cipherpop.com/feeds/security.atom.xml" rel="self"></link><id>https://cipherpop.com/</id><updated>2023-11-23T16:27:00-05:00</updated><entry><title>Security Scanning with SAST in Gitlab CI</title><link href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html" rel="alternate"></link><published>2023-11-23T16:27:00-05:00</published><updated>2023-11-23T16:27:00-05:00</updated><author><name>Mike Holzinger</name></author><id>tag:cipherpop.com,2023-11-23:/security-scanning-with-sast-in-gitlab-ci.html</id><summary type="html">&lt;p&gt;&lt;br&gt;
+Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;strong&gt;&lt;em&gt;Official documentation&lt;/em&gt;&lt;/strong&gt;: &lt;a href="https://docs.gitlab.com/ee/user/application_security/sast/"&gt;Static Application Security Testing (SAST) 
 All tiers
 All offerings
 &lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;The scope …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Gitlab offers a comprehensive set of container and security scanning tools which are provided free to gitlab users on every tier, and with Gitlab's Ultimate tier, also included is set of code vulnerability and security reporting dashboards.&lt;/p&gt;
+&lt;p&gt;The scope of …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;br&gt;
+Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;strong&gt;&lt;em&gt;Official documentation&lt;/em&gt;&lt;/strong&gt;: &lt;a href="https://docs.gitlab.com/ee/user/application_security/sast/"&gt;Static Application Security Testing (SAST) 
 All tiers
 All offerings
 &lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;The scope of this post is to give an example of using the included security scanning tools provided by gitlab first by first posting a small python application with small code vulnerabilities, then introducing a node.js vulnerability.&lt;/p&gt;
+&lt;p&gt;The scope of this post is to give an example of using the included security scanning tools provided by GitLab first by posting a small Python application with minor code vulnerabilities and then introducing a node.js vulnerability.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h1&gt;] Introduce python web app with weak code security posture&lt;/h1&gt;
-&lt;p&gt;We introduce a python application that uses Flask to host a rest application that returns the python version and the container OS version from a REST GET command.&lt;/p&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1&gt;] Introduce a Python web app with a weak code security posture&lt;/h1&gt;
+&lt;p&gt;We introduce a Python application that uses Flask to host a rest application that returns the Python version and the container OS version from a REST GET command.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="nv"&gt;@app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -26,8 +29,9 @@ All offerings
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Add node depency npm module (express) and configure npm_install pipeline build step&lt;/h1&gt;
-&lt;p&gt;To continue adding to our framework, an NPM dependency &lt;a href="https://www.npmjs.com/package/express"&gt;&lt;em&gt;node express&lt;/em&gt;&lt;/a&gt; was added to our project and an additional step in our CI was included to install the NPM step before building our docker container.&lt;/p&gt;
+&lt;p&gt;To continue adding to our framework, an NPM dependency &lt;a href="https://www.npmjs.com/package/express"&gt;&lt;em&gt;node express&lt;/em&gt;&lt;/a&gt; was added to our project, and an additional step in our CI was included to install the NPM step before building our docker container.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;name&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sample-npm-dep&amp;quot;&lt;/span&gt;,
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;version&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;1.0.0&amp;quot;&lt;/span&gt;,
@@ -61,12 +65,12 @@ All offerings
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Pipeline job naming:&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;To enable and match pipeline jobs for SAST and gitlab security templates, the job step in the gitlab pipeline must be named &lt;code&gt;test:&lt;/code&gt; as subsequent templates are defined as children jobs of the test definition &lt;/p&gt;
+&lt;p&gt;To enable and match pipeline jobs for SAST and GitLab security templates, the job step in the GitLab pipeline must be named &lt;code&gt;test:&lt;/code&gt; as subsequent templates are defined as children jobs of the test definition&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;Defining the Include stanza:&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Typically these job templates are already included in the first commit to &lt;code&gt;.gitlab-ci.yml&lt;/code&gt; and can be included by adding a stanza beginning with an "include" key.&lt;/p&gt;
-&lt;p&gt;Templates will be listed as strings. &lt;/p&gt;
+&lt;p&gt;Typically, these job templates are already included in the first commit to &lt;code&gt;.gitlab-ci.yml&lt;/code&gt; and can be included by adding a stanza beginning with an "include" key.&lt;/p&gt;
+&lt;p&gt;Templates will be listed as strings.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;stages:
 &lt;span class="k"&gt;-&lt;/span&gt; npm_install
 &lt;span class="k"&gt;-&lt;/span&gt; build
@@ -85,16 +89,17 @@ sast:
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Running the SAST test job pipeline step against our application code&lt;/h1&gt;
-&lt;p&gt;We've included the basic SAST template. Let's test the output for our python application.&lt;/p&gt;
+&lt;p&gt;We've included the basic SAST template. Let's test the output for our Python application.&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/SAST-Setup-initial-sast-scan.jpg" alt="Pipeline Job for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;h1&gt;] Understanding how SAST scanning generates reporting artifacts&lt;/h1&gt;
-&lt;p&gt;When we look at our new finished pipeline jobs, we can see two new jobs have finished after including the basic SAST template.&lt;/p&gt;
+&lt;p&gt;When we look at our newly finished pipeline jobs, we see two new jobs have been completed after including the basic SAST template.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;nodejs-scan-sast&lt;/li&gt;
 &lt;li&gt;semgrep-sast&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Let's head to to our Artifact repository whihc has been enabled by default by gitlab for this project.&lt;/p&gt;
+&lt;p&gt;Let's head to our Artifact repository, which GitLab enabled by default for this project.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/artifacts"&gt;cipherpop-guidance/containerscanning/-/artifacts&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -117,17 +122,19 @@ sast:
   cyclonedx: &amp;quot;**/gl-sbom-*.cdx.json&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as json.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: If using the free version of gitlab, the report is always generated and can be interpreted as JSON output and can be fed to a third party SEIM without using the Gitlab Security Dashboard.&lt;/p&gt;
+&lt;p&gt;To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as JSON.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: If using the free version of Gitlab, the report is always generated, can be interpreted as JSON output, and can be fed to a third-party SEIM without using the Gitlab Security Dashboard.&lt;/p&gt;
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Project Security Dashboard&lt;/h1&gt;
-&lt;p&gt;Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical, and three vulnerabilities marked as Medium.&lt;/p&gt;
+&lt;p&gt;Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical and three vulnerabilities marked as Medium.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/dashboard"&gt;cipherpop-guidance/containerscanning/-/security/dashboard&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;img src="/images/SAST-Security-Dashboard-001.jpg" alt="Security dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;Let's drill into the details and find out what this dashboard is trying to tell us.&lt;/p&gt;
+&lt;p&gt;Let's drill into the details and find out what this Dashboard tries to tell us.&lt;/p&gt;
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Project Vulnerability Dashboard&lt;/h1&gt;
 &lt;p&gt;Drilling into the Vulnerability dashboard, we can see interpreted detail from the &lt;code&gt;gl-sast-report.json&lt;/code&gt;&lt;/p&gt;
 &lt;ul&gt;
@@ -164,18 +171,20 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;p&gt;Severity: Medium&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;strong&gt;] Section summary&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;We see that the Vulnerability dashboard not only reports the offending line, but also gives us a very comprehensive solution identified to resolve the identified issue.&lt;/p&gt;
-&lt;p&gt;To move this part forward, the medium Security issues, using the submodule process and using Flask will stay in our project, but the Critical warning will get resolved. &lt;/p&gt;
+&lt;p&gt;We see that the Vulnerability dashboard reports the offending line and gives us a comprehensive solution to resolve the identified issue.&lt;/p&gt;
+&lt;p&gt;To move this part forward, the medium Security issues, using the submodule process and using Flask, will stay in our project, but the Critical warning will get resolved.&lt;/p&gt;
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Using the Vulnerability dashboard to Confirm and Resolve issues&lt;/h1&gt;
-&lt;p&gt;We've resolved the outstanding issues and committed a changes to our application.&lt;/p&gt;
-&lt;p&gt;First We can see that our Dashboard shows our resolved status and is asking us to "do something" with the posted alert.&lt;/p&gt;
+&lt;p&gt;We've resolved the outstanding issues and committed changes to our application.&lt;/p&gt;
+&lt;p&gt;First, our Dashboard shows our resolved status and asks us to "do something" with the posted alert.&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-002.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;Next We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.&lt;/p&gt;
+&lt;p&gt;Next, We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-003.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Introducing a new vulnerablity with into Node&lt;/h1&gt;
-&lt;p&gt;Let's test adding a node dependancy with known security issues. &lt;/p&gt;
+&lt;p&gt;Let's test adding a node dependency with known security issues.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&amp;quot;lodash&amp;quot;: &amp;quot;4.17.10&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -184,7 +193,7 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;/ul&gt;
 &lt;p&gt;Enable the following Gitlab security, container and dependancy scanning templates.&lt;/p&gt;
 &lt;p&gt;The $CS_IMAGE variable will also need to be set. &lt;/p&gt;
-&lt;p&gt;Further documentation on setting container scanning variables is hosted here at Gitlab.&lt;/p&gt;
+&lt;p&gt;Further documentation on setting container scanning variables is hosted here at GitLab.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry"&gt;Container Scanning - Scan an image in a remote registry&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -204,8 +213,9 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;/ul&gt;
 &lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-004.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;hr&gt;
+&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h1&gt;] Summary&lt;/h1&gt;
-&lt;p&gt;Gitlab SAST, Container Security and Dependancy scanning are powerful tools, available to to all tiers.&lt;/p&gt;
+&lt;p&gt;GitLab SAST, Container Security, and Dependency scanning are potent tools available to all tiers.&lt;/p&gt;
 &lt;p&gt;Further discussion on this topic will include&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;External SIEM integation&lt;/li&gt;
