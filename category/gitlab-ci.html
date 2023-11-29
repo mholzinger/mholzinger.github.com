@@ -29,246 +29,7 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html">Security Scanning with SAST in Gitlab CI</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-11-23T16:27:00-05:00">
-                Published: Thu 23 November 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="https://cipherpop.com/author/mike-holzinger.html">Mike Holzinger</a>
-        </address>
-<p>In <a href="https://cipherpop.com/category/security.html">Security</a>.</p>
-
-</footer><!-- /.post-info --><p><br>
-Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation</em></strong>: <a href="https://docs.gitlab.com/ee/user/application_security/sast/">Static Application Security Testing (SAST) 
-All tiers
-All offerings
-</a></p>
-<p>The scope of this post is to give an example of using the included security scanning tools provided by GitLab first by posting a small Python application with minor code vulnerabilities and then introducing a node.js vulnerability.</p>
-<hr>
-<p><br></p>
-<h1>] Introduce a Python web app with a weak code security posture</h1>
-<p>We introduce a Python application that uses Flask to host a rest application that returns the Python version and the container OS version from a REST GET command.</p>
-<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-
-<span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-<span class="n">def</span><span class="w"> </span><span class="k">index</span><span class="p">()</span><span class="err">:</span>
-<span class="w">    </span><span class="n">python_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform</span><span class="p">.</span><span class="n">python_version</span><span class="p">()</span>
-<span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="p">.</span><span class="n">check_output</span><span class="p">(</span><span class="ss">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="k">True</span><span class="p">).</span><span class="n">decode</span><span class="p">()</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">f</span><span class="ss">&quot;Python Version: {python_version}\nLinux Version:\n{linux_version}&quot;</span>
-
-<span class="k">if</span><span class="w"> </span><span class="n">__name__</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;__main__&quot;</span><span class="err">:</span>
-<span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="k">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
-</code></pre></div>
-
-<hr>
-<p><br></p>
-<h1>] Add node depency npm module (express) and configure npm_install pipeline build step</h1>
-<p>To continue adding to our framework, an NPM dependency <a href="https://www.npmjs.com/package/express"><em>node express</em></a> was added to our project, and an additional step in our CI was included to install the NPM step before building our docker container.</p>
-<div class="highlight"><pre><span></span><code>{
-<span class="w">  </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;sample-npm-dep&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;version&quot;</span>:<span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;description&quot;</span>:<span class="w"> </span><span class="s2">&quot;A sample NPM dependency&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;main&quot;</span>:<span class="w"> </span><span class="s2">&quot;index.js&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;scripts&quot;</span>:<span class="w"> </span>{
-<span class="w">    </span><span class="s2">&quot;test&quot;</span>:<span class="w"> </span><span class="s2">&quot;echo \&quot;</span><span class="nv">Error</span>:<span class="w"> </span><span class="nv">no</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">specified</span>\<span class="s2">&quot; &amp;&amp; exit 1&quot;</span>
-<span class="w">  </span>},
-<span class="w">  </span><span class="s2">&quot;dependencies&quot;</span>:<span class="w"> </span>{
-<span class="w">    </span><span class="s2">&quot;express&quot;</span>:<span class="w"> </span><span class="s2">&quot;^4.17.1&quot;</span>
-<span class="w">  </span>}
-}
-</code></pre></div>
-
-<p>Add the dependency step to our Gitlab-CI </p>
-<p><code>.gitlab-ci.yml</code></p>
-<div class="highlight"><pre><span></span><code><span class="n">npm_install</span><span class="o">:</span>
-<span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">npm_install</span>
-<span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">node</span><span class="o">:</span><span class="n">latest</span>
-<span class="w">  </span><span class="n">script</span><span class="o">:</span>
-<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">npm</span><span class="w"> </span><span class="n">install</span>
-<span class="w">  </span><span class="n">cache</span><span class="o">:</span>
-<span class="w">    </span><span class="n">paths</span><span class="o">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">node_modules</span><span class="o">/</span>
-</code></pre></div>
-
-<p><img src="/images/SAST-Setup-node-dependency.jpg" alt="Pipeline Job for NPM dependancy" style="border: .5px solid #222222;" /></p>
-<hr>
-<h1>] Enable SAST for repository</h1>
-<p>Items to note:</p>
-<ul>
-<li><strong>Pipeline job naming:</strong></li>
-</ul>
-<p>To enable and match pipeline jobs for SAST and GitLab security templates, the job step in the GitLab pipeline must be named <code>test:</code> as subsequent templates are defined as children jobs of the test definition</p>
-<ul>
-<li><strong>Defining the Include stanza:</strong></li>
-</ul>
-<p>Typically, these job templates are already included in the first commit to <code>.gitlab-ci.yml</code> and can be included by adding a stanza beginning with an "include" key.</p>
-<p>Templates will be listed as strings.</p>
-<div class="highlight"><pre><span></span><code>stages:
-<span class="k">-</span> npm_install
-<span class="k">-</span> build
-<span class="k">-</span> test
-
-include:
-  <span class="k">-</span> template: SAST.gitlab-ci.yml
-
-sast:
-  stage: test
-  script:
-    <span class="k">-</span> /analyzer run
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
-</code></pre></div>
-
-<hr>
-<p><br></p>
-<h1>] Running the SAST test job pipeline step against our application code</h1>
-<p>We've included the basic SAST template. Let's test the output for our Python application.</p>
-<p><img src="/images/SAST-Setup-initial-sast-scan.jpg" alt="Pipeline Job for SAST test" style="border: .5px solid #222222;" /></p>
-<h1>] Understanding how SAST scanning generates reporting artifacts</h1>
-<p>When we look at our newly finished pipeline jobs, we see two new jobs have been completed after including the basic SAST template.</p>
-<ul>
-<li>nodejs-scan-sast</li>
-<li>semgrep-sast</li>
-</ul>
-<p>Let's head to our Artifact repository, which GitLab enabled by default for this project.</p>
-<ul>
-<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/artifacts">cipherpop-guidance/containerscanning/-/artifacts</a></li>
-</ul>
-<p><img src="/images/SAST-Artifact-generation.jpg" alt="Job Artifcats for SAST test" style="border: .5px solid #222222;" /></p>
-<p>In our SAST pipeline job, we asked for the generated report to output as the <code>gl-sast-report.json</code> to help illustrate our example.</p>
-<p>This is a default setting that we don't need for our pipeline to run because it's defined in the template we include.</p>
-<div class="highlight"><pre><span></span><code>sast:
-
-...
-
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
-</code></pre></div>
-
-<p>Another example of default report names are listed below this explanation.</p>
-<div class="highlight"><pre><span></span><code>  sast: gl-sast-report.json
-  container_scanning: gl-container-scanning-report.json
-  dependency_scanning: gl-dependency-scanning-report.json
-  cyclonedx: &quot;**/gl-sbom-*.cdx.json&quot;
-</code></pre></div>
-
-<p>To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as JSON.</p>
-<p><em>Note</em>: If using the free version of Gitlab, the report is always generated, can be interpreted as JSON output, and can be fed to a third-party SEIM without using the Gitlab Security Dashboard.</p>
-<hr>
-<p><br></p>
-<h1>] Project Security Dashboard</h1>
-<p>Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical and three vulnerabilities marked as Medium.</p>
-<ul>
-<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/dashboard">cipherpop-guidance/containerscanning/-/security/dashboard</a></li>
-</ul>
-<p><img src="/images/SAST-Security-Dashboard-001.jpg" alt="Security dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>Let's drill into the details and find out what this Dashboard tries to tell us.</p>
-<hr>
-<p><br></p>
-<h1>] Project Vulnerability Dashboard</h1>
-<p>Drilling into the Vulnerability dashboard, we can see interpreted detail from the <code>gl-sast-report.json</code></p>
-<ul>
-<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/vulnerability_report">cipherpop-guidance/containerscanning/-/security/vulnerability_report</a></li>
-</ul>
-<p><img src="/images/SAST-Vulnerability-Dashboard-001.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>We have warnings for lines 3, 10 and 14 of our python server code.</p>
-<div class="highlight"><pre><span></span><code><span class="mi">03</span>    <span class="kn">import</span> <span class="nn">subprocess</span>
-</code></pre></div>
-
-<blockquote>
-<p>Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')</p>
-<p>Description: Consider possible security implications associated with subprocess module.</p>
-<p>Severity: Medium</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">10</span><span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="mf">.</span><span class="n">check_output</span><span class="p">(</span><span class="s">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="n">True</span><span class="p">)</span><span class="mf">.</span><span class="n">decode</span><span class="p">()</span>
-</code></pre></div>
-
-<blockquote>
-<p>Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')</p>
-<p>Description: Found subprocess function check_output with shell=True. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and
-variables, which makes it much easier for a malicious actor to execute commands. Use shell=False
-instead.</p>
-<p>Severity:  Critical</p>
-</blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">14</span><span class="w">    </span><span class="n">app</span><span class="mf">.</span><span class="kr">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="err">&#39;</span><span class="mf">0.0.0.0</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="n">True</span><span class="p">)</span>
-</code></pre></div>
-
-<blockquote>
-<p>Active debug code</p>
-<p>Description The Flask application is running with debug=True configured. By enabling this option, certain exceptions or errors could cause sensitive information to be leaked in HTTP responses.
-Additionally, it is not recommended to run a Flask application using Flask.run(...) in production. Instead, a WSGI server such as gunicorn or waitress be used instead. For more information on deployment options for Flask applications see:</p>
-<p>https://flask.palletsprojects.com/en/2.3.x/deploying/</p>
-<p>Severity: Medium</p>
-</blockquote>
-<p><strong>] Section summary</strong></p>
-<p>We see that the Vulnerability dashboard reports the offending line and gives us a comprehensive solution to resolve the identified issue.</p>
-<p>To move this part forward, the medium Security issues, using the submodule process and using Flask, will stay in our project, but the Critical warning will get resolved.</p>
-<hr>
-<p><br></p>
-<h1>] Using the Vulnerability dashboard to Confirm and Resolve issues</h1>
-<p>We've resolved the outstanding issues and committed changes to our application.</p>
-<p>First, our Dashboard shows our resolved status and asks us to "do something" with the posted alert.</p>
-<p><img src="/images/SAST-Vulnerability-Dashboard-002.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>Next, We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.</p>
-<p><img src="/images/SAST-Vulnerability-Dashboard-003.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<hr>
-<p><br></p>
-<h1>] Introducing a new vulnerablity with into Node</h1>
-<p>Let's test adding a node dependency with known security issues.</p>
-<div class="highlight"><pre><span></span><code>&quot;lodash&quot;: &quot;4.17.10&quot;
-</code></pre></div>
-
-<ul>
-<li><a href="https://security.snyk.io/package/npm/lodash/4.17.10">Known vulnerabilities in the lodash package</a></li>
-</ul>
-<p>Enable the following Gitlab security, container and dependancy scanning templates.</p>
-<p>The $CS_IMAGE variable will also need to be set. </p>
-<p>Further documentation on setting container scanning variables is hosted here at GitLab.</p>
-<ul>
-<li><a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry">Container Scanning - Scan an image in a remote registry</a></li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="n">variables</span><span class="o">:</span>
-<span class="w">  </span><span class="n">CS_IMAGE</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;registry.gitlab.com/cipherpop-guidance/containerscanning:main&quot;</span>
-
-<span class="k">include</span><span class="o">:</span>
-
-<span class="w">  </span><span class="o">...</span>
-
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Dependency</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Container</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
-</code></pre></div>
-
-<ul>
-<li><a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security">gitlab/ci/templates/Security</a></li>
-</ul>
-<p><img src="/images/SAST-Vulnerability-Dashboard-004.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<hr>
-<p><br></p>
-<h1>] Summary</h1>
-<p>GitLab SAST, Container Security, and Dependency scanning are potent tools available to all tiers.</p>
-<p>Further discussion on this topic will include</p>
-<ul>
-<li>External SIEM integation</li>
-<li>Remediation, Escalation</li>
-</ul>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="https://cipherpop.com/breaking-out-of-docker.html" rel="bookmark"
-                           title="Permalink to Breaking out of the traditional Docker model in Gitlab">Breaking out of the traditional Docker model in Gitlab</a></h1>
-                </header>
-
-                <div class="entry-content">
+                    <h1 class="entry-title"><a href="https://cipherpop.com/breaking-out-of-docker.html">Breaking out of the traditional Docker model in Gitlab</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2023-11-05T10:20:00-05:00">
                 Published: Sun 05 November 2023
@@ -279,13 +40,83 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
         </address>
 <p>In <a href="https://cipherpop.com/category/gitlab-ci.html">Gitlab CI</a>.</p>
 
-</footer><!-- /.post-info -->                <p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
-<p>Gitlab suggests built in methods using the gitlab runner to build docker images using a …</p>
-                <a class="readmore" href="https://cipherpop.com/breaking-out-of-docker.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+</footer><!-- /.post-info --><hr>
+<p>Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a <code>gitlab-ci.yml</code> file in any repo with a Dockerfile.</p>
+<p>Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation:</em></strong> <a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html">Use Docker to build Docker images</a></p>
+<p>As a project's complexity gradually increases, this adds additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.</p>
+<hr>
+<h1 id="our-first-pipeline-commit-job">] Our first pipeline commit job</h1>
+<p>An example below is using a docker image we will call <code>pythonapp-flask</code> being built using dind, first then repeating the same steps using a build using kaniko.</p>
+<div class="highlight"><pre><span></span><code><span class="n">build</span><span class="o">:</span>
+<span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">build</span>
+<span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">stable</span>
+<span class="w">  </span><span class="n">services</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="o">:</span><span class="n">dind</span>
+<span class="w">  </span><span class="n">variables</span><span class="o">:</span>
+<span class="w">    </span><span class="n">DOCKER_HOST</span><span class="o">:</span><span class="w"> </span><span class="n">tcp</span><span class="o">://</span><span class="n">docker</span><span class="o">:</span><span class="mi">2375</span>
+<span class="w">    </span><span class="n">DOCKER_DRIVER</span><span class="o">:</span><span class="w"> </span><span class="n">overlay2</span>
+<span class="w">    </span><span class="n">IMAGE_NAME</span><span class="o">:</span><span class="w"> </span><span class="n">registry</span><span class="o">.</span><span class="na">gitlab</span><span class="o">.</span><span class="na">com</span><span class="sr">/${CI_PROJECT_PATH}/</span><span class="n">pythonapp</span><span class="o">-</span><span class="n">flask</span>
+
+<span class="w">  </span><span class="n">before_script</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">login</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="n">$CI_REGISTRY_USER</span><span class="w"> </span><span class="o">-</span><span class="n">p</span><span class="w"> </span><span class="n">$CI_REGISTRY_PASSWORD</span><span class="w"> </span><span class="n">$CI_REGISTRY</span>
+
+<span class="w">  </span><span class="n">script</span><span class="o">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">build</span><span class="w"> </span><span class="o">-</span><span class="n">t</span><span class="w"> </span><span class="n">$IMAGE_NAME</span><span class="w"> </span><span class="o">.</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">docker</span><span class="w"> </span><span class="n">push</span><span class="w"> </span><span class="n">$IMAGE_NAME</span>
+</code></pre></div>
+
+<p>In our first example, we can use the documentation provided steps to build our container and push to our container registery with a given name <code>pythonapp-flask</code> for our project.</p>
+<blockquote>
+<p>Our source code for the project is here:
+- <a href="https://gitlab.com/mholzinger/containerbuilding">containerbuilding</a></p>
+<p>A project job history can be tracked at:
+-  <a href="https://gitlab.com/mholzinger/containerbuilding/-/pipelines">containerbuilding/-/pipelines</a></p>
+</blockquote>
+<p><img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<hr>
+<h1 id="speeding-things-up">] Speeding things up</h1>
+<p>While the above example only took 52 seconds on average, we can trim even that process down to less than half the time by replacing our docker job with <a href="https://github.com/GoogleContainerTools/kaniko">Kaniko</a></p>
+<p>Our replaced job logic for our gitlab pipeline uses the kaniko executor project, which has a remarkable extensibility for replacing multiple Docker steps with one stage using the kaniko executor.</p>
+<h4 id="step-one">Step one ]</h4>
+<p>Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a <code>docker login</code> command. For our example, we are writing the config.json step using bash redirection and storing in our /kaniko/.docker/ path.</p>
+<div class="highlight"><pre><span></span><code>echo \
+&quot;{\&quot;auths\&quot;:{\&quot;$CI_REGISTRY\&quot;:{\&quot;username\&quot;:\&quot;$CI_REGISTRY_USER\&quot;,\&quot;password\&quot;:\&quot;$CI_REGISTRY_PASSWORD\&quot;}}}&quot; \
+<span class="k">&gt; </span><span class="ge">/kaniko/.docker/config.json</span>
+</code></pre></div>
+
+<p>We call this step in the <code>before_script</code> step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time by calling to the container artifact registry and then writing out a file.</p>
+<h4 id="step-two">Step two ]</h4>
+<p>The next next step, <code>script:</code> is invoking a call to <code>kaniko/executor</code> with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.</p>
+<p>We are replacing two previous docker steps, <code>docker build</code> and <code>docker push</code> with one command.</p>
+<div class="highlight"><pre><span></span><code><span class="n">stages</span><span class="p">:</span>
+<span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">build</span>
+
+<span class="n">build</span><span class="p">:</span>
+<span class="w">  </span><span class="n">stage</span><span class="p">:</span><span class="w"> </span><span class="n">build</span>
+<span class="w">  </span><span class="n">image</span><span class="p">:</span>
+<span class="w">    </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="n">gcr</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">kaniko</span><span class="o">-</span><span class="n">project</span><span class="o">/</span><span class="n">executor</span><span class="p">:</span><span class="n">debug</span>
+<span class="w">    </span><span class="n">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="n">variables</span><span class="p">:</span>
+<span class="w">    </span><span class="n">DOCKER_CONFIG</span><span class="p">:</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span>
+<span class="w">  </span><span class="n">before_script</span><span class="p">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">auths</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY</span><span class="se">\&quot;</span><span class="s2">:{</span><span class="se">\&quot;</span><span class="s2">username</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_USER</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">password</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">$CI_REGISTRY_PASSWORD</span><span class="se">\&quot;</span><span class="s2">}}}&quot;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/.</span><span class="n">docker</span><span class="o">/</span><span class="n">config</span><span class="o">.</span><span class="n">json</span>
+<span class="w">  </span><span class="n">script</span><span class="p">:</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span>
+<span class="w">      </span><span class="o">/</span><span class="n">kaniko</span><span class="o">/</span><span class="n">executor</span><span class="w"> </span><span class="o">--</span><span class="n">context</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="w"> </span>
+<span class="w">      </span><span class="o">--</span><span class="n">dockerfile</span><span class="w"> </span><span class="o">$</span><span class="n">CI_PROJECT_DIR</span><span class="o">/</span><span class="n">Dockerfile</span><span class="w"> </span>
+<span class="w">      </span><span class="o">--</span><span class="n">destination</span><span class="w"> </span><span class="o">$</span><span class="n">CI_REGISTRY_IMAGE</span><span class="p">:</span><span class="o">$</span><span class="n">CI_COMMIT_REF_SLUG</span>
+</code></pre></div>
+
+<p>Let's see this in action.</p>
+<p><img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>Summary: In the above example our time to build and deploy was dropped down to just 23 seconds!</p>
+<hr>
+<h1 id="executing-stages-side-by-side">] Executing stages side by side</h1>
+<p>Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.</p>
+<p><img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /></p>
+<p>The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and reducing cost to one network operation from the gitlab runner to publish to the artifact registry.</p>                </article>
+            </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

@@ -4,10 +4,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Security Scanning with SAST in Gitlab CI</title>
+        <title>Elevating Container Security with Static Application Security Testing (SAST)</title>
         <link rel="stylesheet" href="https://cipherpop.com/theme/css/main.css" />
         <link href="https://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mike Holzinger Atom Feed" />
-        <meta name="description" content="Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's..." />
+        <meta name="description" content="] Introduce a web app with weak code security posture ] Enabling the Static Application Security Testing (SAST) pipeline template ] Run the SAST..." />
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-6WJH3148NM"></script>
         <script>
@@ -32,13 +32,13 @@
     <header>
       <h1 class="entry-title">
         <a href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html" rel="bookmark"
-           title="Permalink to Security Scanning with SAST in Gitlab CI">Security Scanning with SAST in Gitlab CI</a></h1>
+           title="Permalink to Elevating Container Security with Static Application Security Testing (SAST)">Elevating Container Security with Static Application Security Testing (SAST)</a></h1>
     </header>
 
     <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2023-11-23T16:27:00-05:00">
-                Published: Thu 23 November 2023
+        <abbr class="published" title="2023-11-29T14:50:00-05:00">
+                Published: Wed 29 November 2023
         </abbr>
 
         <address class="vcard author">
@@ -46,144 +46,148 @@
         </address>
 <p>In <a href="https://cipherpop.com/category/security.html">Security</a>.</p>
 
-</footer><!-- /.post-info -->      <p><br>
-Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.</p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation</em></strong>: <a href="https://docs.gitlab.com/ee/user/application_security/sast/">Static Application Security Testing (SAST) 
-All tiers
-All offerings
-</a></p>
-<p>The scope of this post is to give an example of using the included security scanning tools provided by GitLab first by posting a small Python application with minor code vulnerabilities and then introducing a node.js vulnerability.</p>
+</footer><!-- /.post-info -->      <p><br></p>
+<div class="toc">
+<ul>
+<li><a href="#introduce-a-web-app-with-weak-code-security-posture">] Introduce a web app with weak code security posture</a></li>
+<li><a href="#enabling-the-static-application-security-testing-sast-pipeline-template">] Enabling the Static Application Security Testing (SAST) pipeline template</a></li>
+<li><a href="#run-the-sast-test-job-pipeline-step-against-application-code">] Run the SAST test job pipeline step against application code</a></li>
+<li><a href="#using-automatically-generated-report-artifacts">] Using automatically generated report artifacts</a></li>
+<li><a href="#dashboard-project-security">] Dashboard: Project Security</a></li>
+<li><a href="#dashboard-project-vulnerability">] Dashboard: Project Vulnerability</a></li>
+<li><a href="#using-the-vulnerability-dashboard-to-confirm-and-resolve-issues">] Using the Vulnerability dashboard to confirm and resolve issues</a></li>
+<li><a href="#introducing-a-node-vulnerability-to-the-project">] Introducing a Node vulnerability to the project</a></li>
+<li><a href="#extend-gitlab-security-scanning-capabilities-with-templates">] Extend GitLab Security Scanning Capabilities with Templates</a></li>
+<li><a href="#validating-sast-and-newly-added-test-pipeline-jobs">] Validating SAST and newly added test pipeline jobs</a></li>
+<li><a href="#referencing-vulnerability-dashboard-changes">] Referencing Vulnerability Dashboard changes</a></li>
+<li><a href="#summary">] Summary</a></li>
+</ul>
+</div>
+<p>Why Scan? (A preamble for the middle manager)</p>
+<p>Code security scanning involves analyzing source code for potential vulnerabilities and weaknesses that could be exploited by attackers. This process helps identify and remediate security flaws before they can be used to launch attacks, compromising sensitive data and disrupting business operations.</p>
+<p>Container security scanning, on the other hand, focuses on detecting and mitigating vulnerabilities within container images, the lightweight and portable units of software that form the basis of cloud-native applications.</p>
+<p>Implementing code security and container security scanning into other infrastructure offers several compelling benefits. By automating the process of identifying and addressing vulnerabilities, organizations can significantly reduce their attack surface and enhance their overall security posture. This proactive approach helps prevent data breaches, protect critical assets, and maintain compliance with industry regulations.</p>
+<p>Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;<strong><em>Official documentation</em></strong>: <a href="https://docs.gitlab.com/ee/user/application_security/sast/">Static Application Security Testing (SAST)</a></p>
+<p>The scope of this post is to give an example of using the included security scanning tools provided by GitLab first by posting a small Python application with minor code vulnerabilities and then introducing a node.js vulnerability to trigger the Security and Vulnerability dashboards.</p>
 <hr>
 <p><br></p>
-<h1>] Introduce a Python web app with a weak code security posture</h1>
-<p>We introduce a Python application that uses Flask to host a rest application that returns the Python version and the container OS version from a REST GET command.</p>
-<div class="highlight"><pre><span></span><code><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<h1 id="introduce-a-web-app-with-weak-code-security-posture">] Introduce a web app with weak code security posture</h1>
+<p>Introduced to the project is Python code that uses Flask to host a rest application that returns the Python version and the container OS version from a REST GET request type.</p>
+<ul>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/blob/7a3cc64c256aeb0e12b9d84494f3ca10c0d232d9/app.py">commit 7A3CC64C (app.py)</a></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="nv">@app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-<span class="n">def</span><span class="w"> </span><span class="k">index</span><span class="p">()</span><span class="err">:</span>
-<span class="w">    </span><span class="n">python_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">platform</span><span class="p">.</span><span class="n">python_version</span><span class="p">()</span>
-<span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="p">.</span><span class="n">check_output</span><span class="p">(</span><span class="ss">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="k">True</span><span class="p">).</span><span class="n">decode</span><span class="p">()</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">f</span><span class="ss">&quot;Python Version: {python_version}\nLinux Version:\n{linux_version}&quot;</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="n">python_version</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span>
+    <span class="n">linux_version</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="s2">&quot;cat /etc/os-release&quot;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Python Version: </span><span class="si">{</span><span class="n">python_version</span><span class="si">}</span><span class="se">\n</span><span class="s2">Linux Version:</span><span class="se">\n</span><span class="si">{</span><span class="n">linux_version</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="k">if</span><span class="w"> </span><span class="n">__name__</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="ss">&quot;__main__&quot;</span><span class="err">:</span>
-<span class="w">    </span><span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="k">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 <hr>
 <p><br></p>
-<h1>] Add node depency npm module (express) and configure npm_install pipeline build step</h1>
-<p>To continue adding to our framework, an NPM dependency <a href="https://www.npmjs.com/package/express"><em>node express</em></a> was added to our project, and an additional step in our CI was included to install the NPM step before building our docker container.</p>
-<div class="highlight"><pre><span></span><code>{
-<span class="w">  </span><span class="s2">&quot;name&quot;</span>:<span class="w"> </span><span class="s2">&quot;sample-npm-dep&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;version&quot;</span>:<span class="w"> </span><span class="s2">&quot;1.0.0&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;description&quot;</span>:<span class="w"> </span><span class="s2">&quot;A sample NPM dependency&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;main&quot;</span>:<span class="w"> </span><span class="s2">&quot;index.js&quot;</span>,
-<span class="w">  </span><span class="s2">&quot;scripts&quot;</span>:<span class="w"> </span>{
-<span class="w">    </span><span class="s2">&quot;test&quot;</span>:<span class="w"> </span><span class="s2">&quot;echo \&quot;</span><span class="nv">Error</span>:<span class="w"> </span><span class="nv">no</span><span class="w"> </span><span class="nv">test</span><span class="w"> </span><span class="nv">specified</span>\<span class="s2">&quot; &amp;&amp; exit 1&quot;</span>
-<span class="w">  </span>},
-<span class="w">  </span><span class="s2">&quot;dependencies&quot;</span>:<span class="w"> </span>{
-<span class="w">    </span><span class="s2">&quot;express&quot;</span>:<span class="w"> </span><span class="s2">&quot;^4.17.1&quot;</span>
-<span class="w">  </span>}
-}
-</code></pre></div>
-
-<p>Add the dependency step to our Gitlab-CI </p>
-<p><code>.gitlab-ci.yml</code></p>
-<div class="highlight"><pre><span></span><code><span class="n">npm_install</span><span class="o">:</span>
-<span class="w">  </span><span class="n">stage</span><span class="o">:</span><span class="w"> </span><span class="n">npm_install</span>
-<span class="w">  </span><span class="n">image</span><span class="o">:</span><span class="w"> </span><span class="n">node</span><span class="o">:</span><span class="n">latest</span>
-<span class="w">  </span><span class="n">script</span><span class="o">:</span>
-<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">npm</span><span class="w"> </span><span class="n">install</span>
-<span class="w">  </span><span class="n">cache</span><span class="o">:</span>
-<span class="w">    </span><span class="n">paths</span><span class="o">:</span>
-<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">node_modules</span><span class="o">/</span>
-</code></pre></div>
-
-<p><img src="/images/SAST-Setup-node-dependency.jpg" alt="Pipeline Job for NPM dependancy" style="border: .5px solid #222222;" /></p>
-<hr>
-<h1>] Enable SAST for repository</h1>
+<h1 id="enabling-the-static-application-security-testing-sast-pipeline-template">] Enabling the Static Application Security Testing (SAST) pipeline template</h1>
+<p>This commit step enables the built in Gitlab Static Application Security Testing (SAST) template which will run in the gitlab runner pipeline test job.</p>
+<p>Involved is including the SAST template, to which the adding the pipeline job, <code>test</code> queues an job in the gitlab runner pipeline execution process. </p>
+<ul>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/blob/5b583d586ff52e6c9222db552f96dbf6774124a7/.gitlab-ci.yml">commit 5B583D58 (.gitlab-ci.yml)</a></li>
+</ul>
 <p>Items to note:</p>
 <ul>
-<li><strong>Pipeline job naming:</strong></li>
+<li><strong>Pipeline job naming</strong></li>
 </ul>
-<p>To enable and match pipeline jobs for SAST and GitLab security templates, the job step in the GitLab pipeline must be named <code>test:</code> as subsequent templates are defined as children jobs of the test definition</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Enabled and matching pipeline jobs for SAST and GitLab security template(s), require the job step in the GitLab pipeline to be named <code>test:</code> as subsequent templates are defined as children jobs of the test definition.</p>
 <ul>
-<li><strong>Defining the Include stanza:</strong></li>
+<li><strong>Defining the Include stanza</strong></li>
 </ul>
-<p>Typically, these job templates are already included in the first commit to <code>.gitlab-ci.yml</code> and can be included by adding a stanza beginning with an "include" key.</p>
-<p>Templates will be listed as strings.</p>
-<div class="highlight"><pre><span></span><code>stages:
-<span class="k">-</span> npm_install
-<span class="k">-</span> build
-<span class="k">-</span> test
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Typically, these job templates are prepended and commented out in the first commit to <code>.gitlab-ci.yml</code> and are included by adding a stanza key called "include".</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Each template is listed as a string.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">stages</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">npm_install</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
 
-include:
-  <span class="k">-</span> template: SAST.gitlab-ci.yml
+<span class="nt">include</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SAST.gitlab-ci.yml</span>
 
-sast:
-  stage: test
-  script:
-    <span class="k">-</span> /analyzer run
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
+<span class="nt">sast</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">test</span>
+<span class="w">  </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/analyzer run</span>
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">reports</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">sast</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gl-sast-report.json</span>
 </code></pre></div>
 
 <hr>
 <p><br></p>
-<h1>] Running the SAST test job pipeline step against our application code</h1>
-<p>We've included the basic SAST template. Let's test the output for our Python application.</p>
+<h1 id="run-the-sast-test-job-pipeline-step-against-application-code">] Run the SAST test job pipeline step against application code</h1>
+<p>Running the test pipeline job for SAST is an automatic step which is queued and completed by the gitlab runner.</p>
+<p>Output for the pipeline is grouped into the unique pipeline job id.</p>
+<ul>
+<li>Pipeline job <a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/pipelines/1084491530">cipherpop-guidance/containerscanning/-/pipelines/1084491530</a></li>
+</ul>
 <p><img src="/images/SAST-Setup-initial-sast-scan.jpg" alt="Pipeline Job for SAST test" style="border: .5px solid #222222;" /></p>
-<h1>] Understanding how SAST scanning generates reporting artifacts</h1>
-<p>When we look at our newly finished pipeline jobs, we see two new jobs have been completed after including the basic SAST template.</p>
+<hr>
+<p><br></p>
+<h1 id="using-automatically-generated-report-artifacts">] Using automatically generated report artifacts</h1>
+<p>Artifacts (objects) are associated to finished pipeline jobs regardless of the outcome state. The two jobs triggered from the SAST pipeline execution step are listed here.</p>
 <ul>
 <li>nodejs-scan-sast</li>
 <li>semgrep-sast</li>
 </ul>
-<p>Let's head to our Artifact repository, which GitLab enabled by default for this project.</p>
+<p>This repository has an associated Artifact repository, which GitLab enabled by default for this project.</p>
 <ul>
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/artifacts">cipherpop-guidance/containerscanning/-/artifacts</a></li>
 </ul>
-<p><img src="/images/SAST-Artifact-generation.jpg" alt="Job Artifcats for SAST test" style="border: .5px solid #222222;" /></p>
-<p>In our SAST pipeline job, we asked for the generated report to output as the <code>gl-sast-report.json</code> to help illustrate our example.</p>
-<p>This is a default setting that we don't need for our pipeline to run because it's defined in the template we include.</p>
-<div class="highlight"><pre><span></span><code>sast:
+<p><img src="/images/SAST-Artifact-generation.jpg" alt="Job Artifacts for SAST test" width="70%" style="border: .5px solid #222222;" /></p>
+<p><strong>Artifact naming:</strong></p>
+<p>Below is an example artifact name declaration for the sast job step in test.</p>
+<p>The <code>gl-sast-report.json</code> artifact is defined to help illustrate naming reports in the <code>artifacts</code> stanza.</p>
+<p>This is a default setting that is not neccesary to declare in <code>gitlab-ci.yml</code> as it is defined in the included SAST pipeline template.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">sast</span><span class="p">:</span>
 
-...
+<span class="nn">...</span>
 
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
+<span class="w">  </span><span class="nt">artifacts</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">reports</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">sast</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gl-sast-report.json</span>
 </code></pre></div>
 
-<p>Another example of default report names are listed below this explanation.</p>
-<div class="highlight"><pre><span></span><code>  sast: gl-sast-report.json
-  container_scanning: gl-container-scanning-report.json
-  dependency_scanning: gl-dependency-scanning-report.json
-  cyclonedx: &quot;**/gl-sbom-*.cdx.json&quot;
+<p>Further report artifact names are listed below to help complete this explanation.</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nt">sast</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gl-sast-report.json</span>
+<span class="w">  </span><span class="nt">container_scanning</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gl-container-scanning-report.json</span>
+<span class="w">  </span><span class="nt">dependency_scanning</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gl-dependency-scanning-report.json</span>
+<span class="w">  </span><span class="nt">cyclonedx</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;**/gl-sbom-*.cdx.json&quot;</span>
 </code></pre></div>
 
-<p>To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as JSON.</p>
-<p><em>Note</em>: If using the free version of Gitlab, the report is always generated, can be interpreted as JSON output, and can be fed to a third-party SEIM without using the Gitlab Security Dashboard.</p>
+<p><em>Note</em>: In all Gitlab user tiers, the report artifacts are generated, and can be downloaded as JSON objects. Artifacts can be fed to a third-party SEIM without using the Gitlab Vulnerability and Security Dashboards.</p>
 <hr>
 <p><br></p>
-<h1>] Project Security Dashboard</h1>
-<p>Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical and three vulnerabilities marked as Medium.</p>
+<h1 id="dashboard-project-security">] Dashboard: Project Security</h1>
+<p>Gitlab Ultimate tier offers dashboard reporting, which interprets the results the SAST job automatically generated Artifacts.</p>
+<p>In this example, the Project Security Dashboard shows that 1 code vulnerability has been flagged as Critical and 3 additional vulnerabilities have been flagged as Medium.</p>
 <ul>
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/dashboard">cipherpop-guidance/containerscanning/-/security/dashboard</a></li>
 </ul>
 <p><img src="/images/SAST-Security-Dashboard-001.jpg" alt="Security dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>Let's drill into the details and find out what this Dashboard tries to tell us.</p>
+<p>This dashboard is configurable to display vulnerabilities over time with a severity classification.</p>
 <hr>
 <p><br></p>
-<h1>] Project Vulnerability Dashboard</h1>
+<h1 id="dashboard-project-vulnerability">] Dashboard: Project Vulnerability</h1>
+<p>Let's drill into the details and find out what this Dashboard tries to tell us.</p>
 <p>Drilling into the Vulnerability dashboard, we can see interpreted detail from the <code>gl-sast-report.json</code></p>
 <ul>
 <li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/vulnerability_report">cipherpop-guidance/containerscanning/-/security/vulnerability_report</a></li>
 </ul>
 <p><img src="/images/SAST-Vulnerability-Dashboard-001.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>We have warnings for lines 3, 10 and 14 of our python server code.</p>
-<div class="highlight"><pre><span></span><code><span class="mi">03</span>    <span class="kn">import</span> <span class="nn">subprocess</span>
+<p>Warnings have been issued for lines 3, 10 and 14 of the app.py server code.</p>
+<div class="highlight"><pre><span></span><code><span class="mi">03</span>  <span class="kn">import</span> <span class="nn">subprocess</span>
 </code></pre></div>
 
 <blockquote>
@@ -191,7 +195,7 @@ sast:
 <p>Description: Consider possible security implications associated with subprocess module.</p>
 <p>Severity: Medium</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">10</span><span class="w">    </span><span class="n">linux_version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subprocess</span><span class="mf">.</span><span class="n">check_output</span><span class="p">(</span><span class="s">&quot;cat /etc/os-release&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">shell</span><span class="o">=</span><span class="n">True</span><span class="p">)</span><span class="mf">.</span><span class="n">decode</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="mi">10</span>  <span class="n">linux_version</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="s2">&quot;cat /etc/os-release&quot;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
 </code></pre></div>
 
 <blockquote>
@@ -201,7 +205,7 @@ variables, which makes it much easier for a malicious actor to execute commands.
 instead.</p>
 <p>Severity:  Critical</p>
 </blockquote>
-<div class="highlight"><pre><span></span><code><span class="mf">14</span><span class="w">    </span><span class="n">app</span><span class="mf">.</span><span class="kr">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="err">&#39;</span><span class="mf">0.0.0.0</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="o">=</span><span class="n">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="mi">14</span>  <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 <blockquote>
@@ -212,56 +216,79 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 <p>Severity: Medium</p>
 </blockquote>
 <p><strong>] Section summary</strong></p>
-<p>We see that the Vulnerability dashboard reports the offending line and gives us a comprehensive solution to resolve the identified issue.</p>
-<p>To move this part forward, the medium Security issues, using the submodule process and using Flask, will stay in our project, but the Critical warning will get resolved.</p>
+<p>As an overview for SAST code inspection, GitLab's Vulnerability dashboard reports the offending line and offers a comprehensive solution to resolve the identified issue.</p>
+<p>To end this overview, the vulnerability issues are resolved in the following commit:</p>
+<ul>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/commit/5249b3f15c6e04ffb78a8d0fc8efdcb182aca1c0">commit 5249B3F1 (app.py)</a></li>
+</ul>
 <hr>
 <p><br></p>
-<h1>] Using the Vulnerability dashboard to Confirm and Resolve issues</h1>
-<p>We've resolved the outstanding issues and committed changes to our application.</p>
-<p>First, our Dashboard shows our resolved status and asks us to "do something" with the posted alert.</p>
+<h1 id="using-the-vulnerability-dashboard-to-confirm-and-resolve-issues">] Using the Vulnerability dashboard to confirm and resolve issues</h1>
+<p>With the critical python issue resolved and committed, a pipeline job has been run and shows the new scan results in the Vulnerability Dashboard.</p>
+<p>The Vulnerability Dashboard shows a resolved status and asks for the project operator to "do something" with the posted alert.</p>
 <p><img src="/images/SAST-Vulnerability-Dashboard-002.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
-<p>Next, We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.</p>
+<p>Next, by marking the <code>Medium</code> severity vulnerabilities as <code>Confirmed</code> the Dashboard captures the confirmation state for further management.</p>
 <p><img src="/images/SAST-Vulnerability-Dashboard-003.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
 <hr>
 <p><br></p>
-<h1>] Introducing a new vulnerablity with into Node</h1>
-<p>Let's test adding a node dependency with known security issues.</p>
-<div class="highlight"><pre><span></span><code>&quot;lodash&quot;: &quot;4.17.10&quot;
+<h1 id="introducing-a-node-vulnerability-to-the-project">] Introducing a Node vulnerability to the project</h1>
+<p>In a commit to add template scanning, a node dependency has been introduced to the project with known security issues.</p>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;lodash&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;4.17.10&quot;</span>
 </code></pre></div>
 
 <ul>
-<li><a href="https://security.snyk.io/package/npm/lodash/4.17.10">Known vulnerabilities in the lodash package</a></li>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/commit/2777c887260c92cffc99af29205c3f8d210d7b5d">commit 2777C887 (package.json)</a></li>
 </ul>
-<p>Enable the following Gitlab security, container and dependancy scanning templates.</p>
-<p>The $CS_IMAGE variable will also need to be set. </p>
-<p>Further documentation on setting container scanning variables is hosted here at GitLab.</p>
-<ul>
-<li><a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry">Container Scanning - Scan an image in a remote registry</a></li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="n">variables</span><span class="o">:</span>
-<span class="w">  </span><span class="n">CS_IMAGE</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;registry.gitlab.com/cipherpop-guidance/containerscanning:main&quot;</span>
-
-<span class="k">include</span><span class="o">:</span>
-
-<span class="w">  </span><span class="o">...</span>
-
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Dependency</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
-<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">template</span><span class="o">:</span><span class="w"> </span><span class="n">Security</span><span class="o">/</span><span class="n">Container</span><span class="o">-</span><span class="n">Scanning</span><span class="o">.</span><span class="na">gitlab</span><span class="o">-</span><span class="n">ci</span><span class="o">.</span><span class="na">yml</span>
+<p>Further info on <code>lodash</code>: <a href="https://security.snyk.io/package/npm/lodash/4.17.10">Known vulnerabilities in the lodash package</a></p>
+<hr>
+<p><br></p>
+<h1 id="extend-gitlab-security-scanning-capabilities-with-templates">] Extend GitLab Security Scanning Capabilities with Templates</h1>
+<p>Extending the GitLab platform's ability to scan, two templates are added to <code>.gitlab-ci.yml</code> deepening the depth of a code security defensive strategy.</p>
+<p>Enabled are the following Gitlab security, container and dependancy scanning templates.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">include</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Security/Dependency-Scanning.gitlab-ci.yml</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Security/Container-Scanning.gitlab-ci.yml</span>
 </code></pre></div>
 
+<p>The <strong>$CS_IMAGE</strong> variable has also been set point to the container intended for scanning.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">variables</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">CS_IMAGE</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;registry.gitlab.com/cipherpop-guidance/containerscanning:main&quot;</span>
+</code></pre></div>
+
+<p>Further documentation on setting container scanning variables is hosted at GitLab:</p>
 <ul>
-<li><a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security">gitlab/ci/templates/Security</a></li>
+<li>
+<p><a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry">Container Scanning - Scan an image in a remote registry</a></p>
+</li>
+<li>
+<p><a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security">gitlab/ci/templates/Security</a></p>
+</li>
 </ul>
+<hr>
+<p><br></p>
+<h1 id="validating-sast-and-newly-added-test-pipeline-jobs">] Validating SAST and newly added test pipeline jobs</h1>
+<p>Follwing a code commit, the pipeline to scan for vulnerabilities has triggered and a new series of report artifacts have been generated in concert with the newly added templates to scan the defined container and project dependancies.</p>
+<ul>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/pipelines/1084994991">cipherpop-guidance/containerscanning/-/pipelines/108499499</a></li>
+</ul>
+<p><img src="/images/SAST-Container-Scanning-Pipeline.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
+<p>Completed jobs in the test pipeline job:</p>
+<ul>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/jobs/5616992631">container_scanning - pipeline test job: 5616992631</a></li>
+<li><a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/jobs/5616992630">gemnasium-python-dependency_scanning - pipeline test job: 5616992630</a></li>
+</ul>
+<hr>
+<p><br></p>
+<h1 id="referencing-vulnerability-dashboard-changes">] Referencing Vulnerability Dashboard changes</h1>
+<p>Following the added code vulnerability, the Vulnerability Dashboard is displaying a staggering set of 5 Critical, 59 High, 224 Medium and 503 Low vulnerability issues from the latest pipeline test scanning job.</p>
 <p><img src="/images/SAST-Vulnerability-Dashboard-004.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /></p>
 <hr>
 <p><br></p>
-<h1>] Summary</h1>
+<h1 id="summary">] Summary</h1>
 <p>GitLab SAST, Container Security, and Dependency scanning are potent tools available to all tiers.</p>
-<p>Further discussion on this topic will include</p>
-<ul>
-<li>External SIEM integation</li>
-<li>Remediation, Escalation</li>
-</ul>
+<p>Additionally, early detection of security flaws can save organizations time and resources that would otherwise be spent on incident response and remediation.</p>
+<p>The implementation of code security and container security scanning into code infrastructure is a crucial step towards achieving a comprehensive and effective security strategy. By proactively identifying and addressing vulnerabilities, Code owners and SREs can safeguard data, protect systems, and maintain business continuity.</p>
+<p>More info on security can be found at <a href="http://cipherpop.com">cipherpop.com</a></p>
     </div><!-- /.entry-content -->
 
   </article>

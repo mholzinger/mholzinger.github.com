@@ -1,232 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Mike Holzinger - Gitlab CI</title><link href="https://cipherpop.com/" rel="alternate"></link><link href="https://cipherpop.com/feeds/gitlab-ci.atom.xml" rel="self"></link><id>https://cipherpop.com/</id><updated>2023-11-23T16:27:00-05:00</updated><entry><title>Security Scanning with SAST in Gitlab CI</title><link href="https://cipherpop.com/security-scanning-with-sast-in-gitlab-ci.html" rel="alternate"></link><published>2023-11-23T16:27:00-05:00</published><updated>2023-11-23T16:27:00-05:00</updated><author><name>Mike Holzinger</name></author><id>tag:cipherpop.com,2023-11-23:/security-scanning-with-sast-in-gitlab-ci.html</id><summary type="html">&lt;p&gt;&lt;br&gt;
-Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;strong&gt;&lt;em&gt;Official documentation&lt;/em&gt;&lt;/strong&gt;: &lt;a href="https://docs.gitlab.com/ee/user/application_security/sast/"&gt;Static Application Security Testing (SAST) 
-All tiers
-All offerings
-&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;The scope of …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;br&gt;
-Gitlab offers a comprehensive set of container and security scanning tools, provided free to Gitlab users on every tier, and with Gitlab's Ultimate tier, a set of code vulnerability and security reporting dashboards is also included.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;strong&gt;&lt;em&gt;Official documentation&lt;/em&gt;&lt;/strong&gt;: &lt;a href="https://docs.gitlab.com/ee/user/application_security/sast/"&gt;Static Application Security Testing (SAST) 
-All tiers
-All offerings
-&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;The scope of this post is to give an example of using the included security scanning tools provided by GitLab first by posting a small Python application with minor code vulnerabilities and then introducing a node.js vulnerability.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Introduce a Python web app with a weak code security posture&lt;/h1&gt;
-&lt;p&gt;We introduce a Python application that uses Flask to host a rest application that returns the Python version and the container OS version from a REST GET command.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="nv"&gt;@app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;index&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;python_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;platform&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;python_version&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;linux_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;subprocess&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;check_output&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;cat /etc/os-release&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;shell&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;True&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;Python Version: {python_version}\nLinux Version:\n{linux_version}&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="err"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;0.0.0.0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Add node depency npm module (express) and configure npm_install pipeline build step&lt;/h1&gt;
-&lt;p&gt;To continue adding to our framework, an NPM dependency &lt;a href="https://www.npmjs.com/package/express"&gt;&lt;em&gt;node express&lt;/em&gt;&lt;/a&gt; was added to our project, and an additional step in our CI was included to install the NPM step before building our docker container.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;{
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;name&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;sample-npm-dep&amp;quot;&lt;/span&gt;,
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;version&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;1.0.0&amp;quot;&lt;/span&gt;,
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;description&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;A sample NPM dependency&amp;quot;&lt;/span&gt;,
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;main&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;index.js&amp;quot;&lt;/span&gt;,
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;scripts&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;{
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;test&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;echo \&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;Error&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;no&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;test&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;specified&lt;/span&gt;\&lt;span class="s2"&gt;&amp;quot; &amp;amp;&amp;amp; exit 1&amp;quot;&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;},
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;dependencies&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;{
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;express&amp;quot;&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;^4.17.1&amp;quot;&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;}
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Add the dependency step to our Gitlab-CI &lt;/p&gt;
-&lt;p&gt;&lt;code&gt;.gitlab-ci.yml&lt;/code&gt;&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;npm_install&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;stage&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;npm_install&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;latest&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;script&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;npm&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;install&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;cache&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;paths&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;node_modules&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;img src="/images/SAST-Setup-node-dependency.jpg" alt="Pipeline Job for NPM dependancy" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;h1&gt;] Enable SAST for repository&lt;/h1&gt;
-&lt;p&gt;Items to note:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Pipeline job naming:&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;To enable and match pipeline jobs for SAST and GitLab security templates, the job step in the GitLab pipeline must be named &lt;code&gt;test:&lt;/code&gt; as subsequent templates are defined as children jobs of the test definition&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Defining the Include stanza:&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Typically, these job templates are already included in the first commit to &lt;code&gt;.gitlab-ci.yml&lt;/code&gt; and can be included by adding a stanza beginning with an "include" key.&lt;/p&gt;
-&lt;p&gt;Templates will be listed as strings.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;stages:
-&lt;span class="k"&gt;-&lt;/span&gt; npm_install
-&lt;span class="k"&gt;-&lt;/span&gt; build
-&lt;span class="k"&gt;-&lt;/span&gt; test
-
-include:
-  &lt;span class="k"&gt;-&lt;/span&gt; template: SAST.gitlab-ci.yml
-
-sast:
-  stage: test
-  script:
-    &lt;span class="k"&gt;-&lt;/span&gt; /analyzer run
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Running the SAST test job pipeline step against our application code&lt;/h1&gt;
-&lt;p&gt;We've included the basic SAST template. Let's test the output for our Python application.&lt;/p&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Setup-initial-sast-scan.jpg" alt="Pipeline Job for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;h1&gt;] Understanding how SAST scanning generates reporting artifacts&lt;/h1&gt;
-&lt;p&gt;When we look at our newly finished pipeline jobs, we see two new jobs have been completed after including the basic SAST template.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;nodejs-scan-sast&lt;/li&gt;
-&lt;li&gt;semgrep-sast&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Let's head to our Artifact repository, which GitLab enabled by default for this project.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/artifacts"&gt;cipherpop-guidance/containerscanning/-/artifacts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Artifact-generation.jpg" alt="Job Artifcats for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;In our SAST pipeline job, we asked for the generated report to output as the &lt;code&gt;gl-sast-report.json&lt;/code&gt; to help illustrate our example.&lt;/p&gt;
-&lt;p&gt;This is a default setting that we don't need for our pipeline to run because it's defined in the template we include.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sast:
-
-...
-
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Another example of default report names are listed below this explanation.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  sast: gl-sast-report.json
-  container_scanning: gl-container-scanning-report.json
-  dependency_scanning: gl-dependency-scanning-report.json
-  cyclonedx: &amp;quot;**/gl-sbom-*.cdx.json&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;To simplify the course of this post, we'll move forward to the dashboard reporting, which will interpret the results of our report, which is available to download as JSON.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Note&lt;/em&gt;: If using the free version of Gitlab, the report is always generated, can be interpreted as JSON output, and can be fed to a third-party SEIM without using the Gitlab Security Dashboard.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Project Security Dashboard&lt;/h1&gt;
-&lt;p&gt;Our Project Security Dashboard shows us that we have 1 code vulnerability marked as Critical and three vulnerabilities marked as Medium.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/dashboard"&gt;cipherpop-guidance/containerscanning/-/security/dashboard&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Security-Dashboard-001.jpg" alt="Security dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;Let's drill into the details and find out what this Dashboard tries to tell us.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Project Vulnerability Dashboard&lt;/h1&gt;
-&lt;p&gt;Drilling into the Vulnerability dashboard, we can see interpreted detail from the &lt;code&gt;gl-sast-report.json&lt;/code&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://gitlab.com/cipherpop-guidance/containerscanning/-/security/vulnerability_report"&gt;cipherpop-guidance/containerscanning/-/security/vulnerability_report&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-001.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;We have warnings for lines 3, 10 and 14 of our python server code.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mi"&gt;03&lt;/span&gt;    &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;subprocess&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')&lt;/p&gt;
-&lt;p&gt;Description: Consider possible security implications associated with subprocess module.&lt;/p&gt;
-&lt;p&gt;Severity: Medium&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;linux_version&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;subprocess&lt;/span&gt;&lt;span class="mf"&gt;.&lt;/span&gt;&lt;span class="n"&gt;check_output&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;cat /etc/os-release&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;shell&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="mf"&gt;.&lt;/span&gt;&lt;span class="n"&gt;decode&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')&lt;/p&gt;
-&lt;p&gt;Description: Found subprocess function check_output with shell=True. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and
-variables, which makes it much easier for a malicious actor to execute commands. Use shell=False
-instead.&lt;/p&gt;
-&lt;p&gt;Severity:  Critical&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="mf"&gt;14&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="mf"&gt;.&lt;/span&gt;&lt;span class="kr"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="mf"&gt;0.0.0.0&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Active debug code&lt;/p&gt;
-&lt;p&gt;Description The Flask application is running with debug=True configured. By enabling this option, certain exceptions or errors could cause sensitive information to be leaked in HTTP responses.
-Additionally, it is not recommended to run a Flask application using Flask.run(...) in production. Instead, a WSGI server such as gunicorn or waitress be used instead. For more information on deployment options for Flask applications see:&lt;/p&gt;
-&lt;p&gt;https://flask.palletsprojects.com/en/2.3.x/deploying/&lt;/p&gt;
-&lt;p&gt;Severity: Medium&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;] Section summary&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;We see that the Vulnerability dashboard reports the offending line and gives us a comprehensive solution to resolve the identified issue.&lt;/p&gt;
-&lt;p&gt;To move this part forward, the medium Security issues, using the submodule process and using Flask, will stay in our project, but the Critical warning will get resolved.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Using the Vulnerability dashboard to Confirm and Resolve issues&lt;/h1&gt;
-&lt;p&gt;We've resolved the outstanding issues and committed changes to our application.&lt;/p&gt;
-&lt;p&gt;First, our Dashboard shows our resolved status and asks us to "do something" with the posted alert.&lt;/p&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-002.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;p&gt;Next, We are marking the following vulnerabilities as "Confirmed" and moving on to our next steps.&lt;/p&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-003.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Introducing a new vulnerablity with into Node&lt;/h1&gt;
-&lt;p&gt;Let's test adding a node dependency with known security issues.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&amp;quot;lodash&amp;quot;: &amp;quot;4.17.10&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://security.snyk.io/package/npm/lodash/4.17.10"&gt;Known vulnerabilities in the lodash package&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Enable the following Gitlab security, container and dependancy scanning templates.&lt;/p&gt;
-&lt;p&gt;The $CS_IMAGE variable will also need to be set. &lt;/p&gt;
-&lt;p&gt;Further documentation on setting container scanning variables is hosted here at GitLab.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://docs.gitlab.com/ee/user/application_security/container_scanning/#scan-an-image-in-a-remote-registry"&gt;Container Scanning - Scan an image in a remote registry&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;variables&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;CS_IMAGE&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;registry.gitlab.com/cipherpop-guidance/containerscanning:main&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;include&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;
-
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;template&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Security&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Dependency&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Scanning&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;gitlab&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;ci&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;yml&lt;/span&gt;
-&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;template&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Security&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Container&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;Scanning&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;gitlab&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;ci&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;yml&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://gitlab.com/gitlab-org/gitlab/-/tree/master/lib/gitlab/ci/templates/Security"&gt;gitlab/ci/templates/Security&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;img src="/images/SAST-Vulnerability-Dashboard-004.jpg" alt="vulnerability dash for SAST test" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;h1&gt;] Summary&lt;/h1&gt;
-&lt;p&gt;GitLab SAST, Container Security, and Dependency scanning are potent tools available to all tiers.&lt;/p&gt;
-&lt;p&gt;Further discussion on this topic will include&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;External SIEM integation&lt;/li&gt;
-&lt;li&gt;Remediation, Escalation&lt;/li&gt;
-&lt;/ul&gt;</content><category term="Security"></category></entry><entry><title>Breaking out of the traditional Docker model in Gitlab</title><link href="https://cipherpop.com/breaking-out-of-docker.html" rel="alternate"></link><published>2023-11-05T10:20:00-05:00</published><updated>2023-11-05T10:20:00-05:00</updated><author><name>Mike Holzinger</name></author><id>tag:cipherpop.com,2023-11-05:/breaking-out-of-docker.html</id><summary type="html">&lt;p&gt;Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a &lt;code&gt;gitlab-ci.yml&lt;/code&gt; file in any repo with a Dockerfile.&lt;/p&gt;
-&lt;p&gt;Gitlab suggests built in methods using the gitlab runner to build docker images using a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a &lt;code&gt;gitlab-ci.yml&lt;/code&gt; file in any repo with a Dockerfile.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Mike Holzinger - Gitlab CI</title><link href="https://cipherpop.com/" rel="alternate"></link><link href="https://cipherpop.com/feeds/gitlab-ci.atom.xml" rel="self"></link><id>https://cipherpop.com/</id><updated>2023-11-05T10:20:00-05:00</updated><entry><title>Breaking out of the traditional Docker model in Gitlab</title><link href="https://cipherpop.com/breaking-out-of-docker.html" rel="alternate"></link><published>2023-11-05T10:20:00-05:00</published><updated>2023-11-05T10:20:00-05:00</updated><author><name>Mike Holzinger</name></author><id>tag:cipherpop.com,2023-11-05:/breaking-out-of-docker.html</id><summary type="html">&lt;hr&gt;
+&lt;p&gt;Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a &lt;code&gt;gitlab-ci.yml&lt;/code&gt; file in any repo with a Dockerfile.&lt;/p&gt;
+&lt;p&gt;Gitlab suggests built in methods using the gitlab runner to build docker images using a …&lt;/p&gt;</summary><content type="html">&lt;hr&gt;
+&lt;p&gt;Building to deploy docker images using Gitlab CI is a fairly straight forward process to setup and start managing in a few easy steps using a &lt;code&gt;gitlab-ci.yml&lt;/code&gt; file in any repo with a Dockerfile.&lt;/p&gt;
 &lt;p&gt;Gitlab suggests built in methods using the gitlab runner to build docker images using a Docker-in-docker process (dind) to manage building and deploying images to the artifact registry provided.&lt;/p&gt;
 &lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;strong&gt;&lt;em&gt;Official documentation:&lt;/em&gt;&lt;/strong&gt; &lt;a href="https://docs.gitlab.com/ee/ci/docker/using_docker_build.html"&gt;Use Docker to build Docker images&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;As a project's complexity gradually increases, this adds additional job steps to the Gitlab CI pipeline activity and ultimately slows down building to deploy times.&lt;/p&gt;
 &lt;hr&gt;
-&lt;h1&gt;] Our first pipeline commit job&lt;/h1&gt;
+&lt;h1 id="our-first-pipeline-commit-job"&gt;] Our first pipeline commit job&lt;/h1&gt;
 &lt;p&gt;An example below is using a docker image we will call &lt;code&gt;pythonapp-flask&lt;/code&gt; being built using dind, first then repeating the same steps using a build using kaniko.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;build&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
 &lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;stage&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;build&lt;/span&gt;
@@ -255,10 +36,10 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;/blockquote&gt;
 &lt;p&gt;&lt;img src="/images/DIND-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;hr&gt;
-&lt;h1&gt;] Speeding things up&lt;/h1&gt;
+&lt;h1 id="speeding-things-up"&gt;] Speeding things up&lt;/h1&gt;
 &lt;p&gt;While the above example only took 52 seconds on average, we can trim even that process down to less than half the time by replacing our docker job with &lt;a href="https://github.com/GoogleContainerTools/kaniko"&gt;Kaniko&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Our replaced job logic for our gitlab pipeline uses the kaniko executor project, which has a remarkable extensibility for replacing multiple Docker steps with one stage using the kaniko executor.&lt;/p&gt;
-&lt;h4&gt;Step one ]&lt;/h4&gt;
+&lt;h4 id="step-one"&gt;Step one ]&lt;/h4&gt;
 &lt;p&gt;Our first step with kaniko involves creating a docker config.json file to authenticate to our container registry, the same as we would using a &lt;code&gt;docker login&lt;/code&gt; command. For our example, we are writing the config.json step using bash redirection and storing in our /kaniko/.docker/ path.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;echo \
 &amp;quot;{\&amp;quot;auths\&amp;quot;:{\&amp;quot;$CI_REGISTRY\&amp;quot;:{\&amp;quot;username\&amp;quot;:\&amp;quot;$CI_REGISTRY_USER\&amp;quot;,\&amp;quot;password\&amp;quot;:\&amp;quot;$CI_REGISTRY_PASSWORD\&amp;quot;}}}&amp;quot; \
@@ -266,7 +47,7 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We call this step in the &lt;code&gt;before_script&lt;/code&gt; step in our build stage, and by creating the file using our keys in a local step on the runner in the setup stage, we are skipping an expensive login step which would have added time by calling to the container artifact registry and then writing out a file.&lt;/p&gt;
-&lt;h4&gt;Step two ]&lt;/h4&gt;
+&lt;h4 id="step-two"&gt;Step two ]&lt;/h4&gt;
 &lt;p&gt;The next next step, &lt;code&gt;script:&lt;/code&gt; is invoking a call to &lt;code&gt;kaniko/executor&lt;/code&gt; with a Dockerfile and the container registry and our commit tag as the tag for for the Docker image we build and push.&lt;/p&gt;
 &lt;p&gt;We are replacing two previous docker steps, &lt;code&gt;docker build&lt;/code&gt; and &lt;code&gt;docker push&lt;/code&gt; with one command.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;stages&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
@@ -292,7 +73,7 @@ Additionally, it is not recommended to run a Flask application using Flask.run(.
 &lt;p&gt;&lt;img src="/images/Kaniko-Build-and-push.jpg" alt="Kaniko Pipeline Job output in gitlab" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;p&gt;Summary: In the above example our time to build and deploy was dropped down to just 23 seconds!&lt;/p&gt;
 &lt;hr&gt;
-&lt;h1&gt;] Executing stages side by side&lt;/h1&gt;
+&lt;h1 id="executing-stages-side-by-side"&gt;] Executing stages side by side&lt;/h1&gt;
 &lt;p&gt;Finaly doing a real world test and having both steps execute side by side in the same pipeline, dind and kaniko both demostrate consistent execution times for our defined pipeline pipeline jobs, with dind taking nearly one minute and kaniko executor finishing in 24 seconds this time.&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/DIND-KANIKO-Build-and-push.jpg" alt="Pipeline Job output in gitlab" style="border: .5px solid #222222;" /&gt;&lt;/p&gt;
 &lt;p&gt;The real world benefits for removing the older dind driver model for kaniko executor speak to fast deploy times and reducing cost to one network operation from the gitlab runner to publish to the artifact registry.&lt;/p&gt;</content><category term="Gitlab CI"></category></entry></feed>

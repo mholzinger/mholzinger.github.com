@@ -470,3 +470,28 @@ li:first-child .hentry, #content > .hentry {border: 0; margin: 0;}
 
 	#add-comment input[type='submit'] {float: right; margin: 0 .5em;}
 	#add-comment * {margin-bottom: .5em;}
+
+	/* Table of Contents */
+	.toc {
+    font-size: small;
+    display: table;
+    width: auto;
+}
+
+/* TOC heading in bold */
+.toc .toctitle {
+    font-weight: bold;
+}
+
+/* No bullets for toc list, indentation of nested lists 1em */
+.toc ul {
+    list-style-type: none;
+    padding-left: 1rem;
+}
+
+/* Top level list has no indentation */
+.toc > ul {
+    /* no indentation */
+    padding-left: 0;
+    margin-top: 0;
+}
