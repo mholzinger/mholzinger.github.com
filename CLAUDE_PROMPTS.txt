@@ -1,0 +1,180 @@
+# Claude Code Prompts for Pelican Blog
+# Copy and paste these into Claude Code in VS Code for common blog tasks
+
+================================================================================
+PROMPT 1: Create a New Article
+================================================================================
+
+I want to create a new blog article. Please:
+
+1. Create a new markdown file in content/ with proper frontmatter
+2. Use this template:
+   - Title: [I'll tell you the title]
+   - Date: [today's date and time]
+   - Category: [Gitlab CI, Security, or new category]
+   - Author: Mike Holzinger
+
+3. Include sections for introduction, main content, code examples if relevant, and conclusion
+
+Can you create content/[article-slug].md for me?
+
+================================================================================
+PROMPT 2: Build the Site Locally
+================================================================================
+
+Please build my Pelican site for local preview:
+
+1. Make sure I'm on the pelican branch
+2. Run: pelican content -s publishconf.py
+3. Show me any errors or warnings
+4. Let me know when it's ready to publish
+
+================================================================================
+PROMPT 3: Publish Article to Main Branch
+================================================================================
+
+I'm ready to publish my new article. Please:
+
+1. Verify I'm on the pelican branch
+2. Run: pelican content -s publishconf.py
+3. Switch to main branch
+4. Copy all files from output/ to the root directory (preserving directory structure)
+5. Stage all changes
+6. Show me a git diff summary of what changed
+7. Create a commit with message: "Publish: [article title]"
+
+DO NOT push yet - I'll review first.
+
+================================================================================
+PROMPT 4: Add Images to Article
+================================================================================
+
+I need to add images to my article. Please:
+
+1. Check if content/images/ directory exists (create if needed)
+2. Tell me where to place my image files
+3. Show me the correct markdown syntax to reference images
+4. Update my article at content/[filename].md to include the image references
+
+The image syntax should be: ![Alt text](/images/image-name.jpg)
+
+================================================================================
+PROMPT 5: Preview Build Output
+================================================================================
+
+I want to preview what will be published. Please:
+
+1. Show me what HTML files were generated in output/
+2. Check if my new article was built correctly
+3. List any files that will be added/changed when I publish to main
+4. Verify the article appears in the index and feeds
+
+================================================================================
+PROMPT 6: Fix Build Errors
+================================================================================
+
+My Pelican build is showing errors. Please:
+
+1. Read the error output
+2. Identify the issue (common issues: missing metadata, invalid markdown, plugin errors)
+3. Fix the problem in my content files
+4. Rebuild to verify the fix worked
+
+================================================================================
+PROMPT 7: Create New Category
+================================================================================
+
+I want to create a new article category. Please:
+
+1. Show me the current categories in use
+2. Update my article's Category metadata to: [new category name]
+3. Rebuild the site to generate the new category page
+4. Verify the new category appears in the navigation
+
+================================================================================
+PROMPT 8: Update Existing Article
+================================================================================
+
+I need to update an existing published article. Please:
+
+1. Help me identify which markdown source file corresponds to the published article
+2. Open the source file for editing
+3. After I make changes, rebuild the site
+4. Show me the diff of what changed in the generated HTML
+
+Note: If the article doesn't have a source file (published before Pelican setup),
+we'll need to create one from the HTML.
+
+================================================================================
+PROMPT 9: Check Repository Status
+================================================================================
+
+Please check my blog repository status:
+
+1. Show current git branch
+2. List any uncommitted changes
+3. Show the difference between pelican and main branches
+4. Verify pelican branch has source files and main has published HTML
+
+================================================================================
+PROMPT 10: Quick Publish Workflow (Combined)
+================================================================================
+
+I have a new article ready to publish. Please run the complete workflow:
+
+1. Verify I'm on pelican branch with uncommitted article in content/
+2. Commit the article source: "Add article: [title]"
+3. Build with: pelican content -s publishconf.py
+4. Switch to main branch
+5. Copy output/* to root
+6. Create commit: "Publish: [title]"
+7. Show me summary of what will be published
+8. Ask if I want to push to origin
+
+================================================================================
+PROMPT 11: Setup New Environment
+================================================================================
+
+I'm on a new machine and need to set up my blog environment. Please:
+
+1. Check if Pelican is installed (python3, pip)
+2. Install Pelican and markdown: uv pip install --system pelican markdown
+3. Verify the installation works
+4. Test build the site
+5. Show me the README workflow
+
+================================================================================
+PROMPT 12: Rollback Published Article
+================================================================================
+
+I need to unpublish or rollback an article on main. Please:
+
+1. Show me recent commits on main branch
+2. Help me identify the commit that published the article
+3. Create a plan to remove the article HTML while preserving other content
+4. Execute the rollback (but don't push until I confirm)
+
+================================================================================
+TIPS FOR USING THESE PROMPTS
+================================================================================
+
+1. Always specify the article title/filename when relevant
+2. Claude Code can see your current files and git status
+3. You can combine prompts (e.g., "Create article + build + publish")
+4. Ask Claude to explain what it's doing if you want to learn the commands
+5. Claude can read errors and help debug build issues
+
+================================================================================
+COMMON FOLLOW-UP QUESTIONS
+================================================================================
+
+- "Show me the generated HTML for this article"
+- "What images are referenced in my article?"
+- "Commit these changes to pelican branch"
+- "Push both branches to GitHub"
+- "What will change if I publish this now?"
+- "Fix the syntax error in my markdown"
+- "Add a table of contents to my article"
+- "Update the article date to today"
+
+================================================================================
