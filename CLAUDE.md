@@ -67,7 +67,9 @@ The PDF iframe in `/pages/bio.html` only resolves when served from a real HTTP o
 
 **Always preview with the dev build (`pelicanconf.py`), not the prod build (`publishconf.py`).**
 
-The prod build sets `SITEURL=http://cipherpop.com` and `RELATIVE_URLS=False`, so the generated HTML loads CSS, JS, images, and the resume PDF from `cipherpop.com` — not from your localhost server. You end up with a hybrid: HTML from local, assets from production. Theme/CSS changes you just made won't appear because the browser is fetching the OLD deployed CSS, even though your local server has the new one.
+The prod build sets `SITEURL=https://cipherpop.com` and `RELATIVE_URLS=False`, so the generated HTML loads CSS, JS, images, and the resume PDF from `cipherpop.com` — not from your localhost server. You end up with a hybrid: HTML from local, assets from production. Theme/CSS changes you just made won't appear because the browser is fetching the OLD deployed CSS, even though your local server has the new one.
+
+**SITEURL must be `https://`** — GitHub Pages serves cipherpop.com over HTTPS (auto-renewed cert, free). If `publishconf.py` ever has `http://`, browsers block CSS/images/PDF as mixed content and the site renders as text-only. Already learned this the hard way on 2026-05-20.
 
 If you've already built with publishconf and want to preview, rebuild with pelicanconf before opening the local server.
 
