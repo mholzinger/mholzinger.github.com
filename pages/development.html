@@ -4,7 +4,7 @@
                         <meta charset="utf-8" />
                         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                         <meta name="generator" content="Pelican" />
-                        <title>Mike Holzinger</title>
+                        <title>Development</title>
                         <link rel="stylesheet" href="http://cipherpop.com/theme/css/main.css" />
                                 <link href="http://cipherpop.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Mike Holzinger Atom Feed" />
         </head>
@@ -20,12 +20,17 @@
                                         <li><a href="/pages/archive.html">Archive</a></li>
                         </ul></nav>
                 </header><!-- /#banner -->
-    <section id="content" class="body">
-        <h1>Archives for Mike Holzinger</h1>
-
-        <dl>
-        </dl>
-    </section>
+  <section id="content" class="body">
+    <h1 class="entry-title">Development</h1>
+    
+    <p>A few open-source projects worth a look.</p>
+<h3><a href="https://github.com/mholzinger/portable-argocd">portable-argocd</a></h3>
+<p>An Argo CD API test harness that spins up a disposable kind-based Kubernetes cluster with a full Argo CD install for validating real API behavior. Uncovered (and documents) that the refresh endpoint treats every value except <code>hard</code> as cached — a quiet divergence from the docs.</p>
+<h3><a href="https://github.com/mholzinger/reframe">reframe</a></h3>
+<p>Face-recognition photo finder with neighbor expansion — recovers photos of a specific person from large or recovered collections where EXIF and folder structure are gone. Python + Docker, dlib-based, with SQLite caching and parallel workers. Built to run on a Synology NAS.</p>
+<h3><a href="https://github.com/mholzinger/dummypod">dummypod</a></h3>
+<p>A lightweight Flask pod for testing AWS EKS Kubernetes clusters — <code>/health</code> and <code>/metrics</code> endpoints, Terraform-deployable, designed as a sidekick for blue-green deployments and CI/CD pipelines.</p>
+  </section>
                 <section id="extras" class="body">
                                 <div class="blogroll">
                                         <h2>links</h2>
