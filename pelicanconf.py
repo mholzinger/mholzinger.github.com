@@ -27,11 +27,31 @@ LINKS = (('Resume', 'Resume.pdf'),
 
 DEFAULT_PAGINATION = 10
 
+# Use the local theme (notmyidea + gitlab icon + banner-stripped footer).
+import os
+THEME = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'theme')
+
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
+
+# Pin top-nav order explicitly. Disable auto menus so pages don't duplicate.
+DISPLAY_PAGES_ON_MENU = False
+DISPLAY_CATEGORIES_ON_MENU = False
+MENUITEMS = (
+    ('Resume',      '/Resume.pdf'),
+    ('Development', '/pages/development.html'),
+    ('Bio',         '/pages/bio.html'),
+    ('Game Design', '/pages/game-design.html'),
+    ('Archive',     '/pages/archive.html'),
+)
 
 PLUGINS = [
     # ...
     'pelican_fontawesome'
     # ...
 ]
+
+# Publish Resume.pdf at the site root (so /Resume.pdf works) instead of /images/Resume.pdf.
+EXTRA_PATH_METADATA = {
+    'images/Resume.pdf': {'path': 'Resume.pdf'},
+}
