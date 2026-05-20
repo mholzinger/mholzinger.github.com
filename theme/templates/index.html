@@ -49,17 +49,18 @@
             {% endif %}
         {% endfor %}
     {% else %}
-        <section id="content" class="body">
-            {% if pages %}
-                <h2>Pages</h2>
-                <ul>
-                    {% for page in pages %}
-                        <li><a href="{{ SITEURL }}/{{ page.url }}">{{ page.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>This site currently has no content.</p>
-            {% endif %}
+        <section id="content" class="body" style="text-align: center;">
+            <img src="{{ SITEURL }}/images/headshot.jpg" alt="Mike Holzinger" style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin: 1.5em auto 0.75em; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" />
+            <p style="font-size: 1.15em; max-width: 620px; margin: 0.5em auto 1em; line-height: 1.5;">
+                Software engineer in Brooklyn, NY — platform engineering, site reliability, developer automation. Outside of work: Intellivision homebrew, retro console tools, and original game design.
+            </p>
+            <p style="font-size: 1em; margin: 1em auto 2em;">
+                <a href="{{ SITEURL }}/Resume.pdf">Resume</a> &nbsp;·&nbsp;
+                <a href="{{ SITEURL }}/pages/bio.html">Bio</a> &nbsp;·&nbsp;
+                <a href="{{ SITEURL }}/pages/development.html">Development</a> &nbsp;·&nbsp;
+                <a href="{{ SITEURL }}/pages/game-design.html">Game Design</a> &nbsp;·&nbsp;
+                <a href="{{ SITEURL }}/pages/archive.html">Archive</a>
+            </p>
         </section>
     {% endif %}
 {% endblock content %}
