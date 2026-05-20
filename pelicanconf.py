@@ -21,9 +21,9 @@ SOCIAL= (('LinkedIn', 'http://www.linkedin.com/in/mikeholzinger/'),
          ('GitHub', 'https://github.com/mholzinger?tab=repositories'),
          ('GitLab', 'https://gitlab.com/users/mholzinger/projects'))
 
-# Social Widget
-LINKS = (('Resume', 'Resume.pdf'),
-         ('',''))
+# Sidebar "links" widget. Resume is in top nav, so dropped here.
+LINKS = (('Games on itch.io', 'https://paisleyboxers.itch.io'),
+         ('Overlay Editor',   'https://intellivision-overlay-editor.fly.dev/'))
 
 DEFAULT_PAGINATION = 10
 
