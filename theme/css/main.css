@@ -322,11 +322,22 @@ div.figure p.caption, figure p.caption { /* margin provided by figure */
 		max-width: 175px;
 	}
 
-	#extras div[class='social'] a {
+	#extras div[class='social'] a,
+	#extras div[class='blogroll'] a {
 		background-repeat: no-repeat;
 		background-position: 3px 6px;
 		padding-left: 25px;
 	}
+
+		/* Blogroll icons */
+		.blogroll a[href*='itch.io'] {
+			background-image: url('../images/icons/itch.png');
+			background-size: 16px 16px;
+		}
+		.blogroll a[href*='intellivision-overlay-editor'] {
+			background-image: url('../images/icons/alien.png');
+			background-size: 16px 16px;
+		}
 
 		/* Icons */
 		.social a[href*='about.me'] {background-image: url('../images/icons/aboutme.png');}
