@@ -201,7 +201,7 @@ div.figure p.caption, figure p.caption { /* margin provided by figure */
 	#banner nav {
 		background: #000305;
 		font-size: 1.143em;
-		overflow: auto;
+		overflow: visible;
 		line-height: 30px;
 		margin: 0 auto 2em auto;
 		padding: 0;
@@ -214,6 +214,7 @@ div.figure p.caption, figure p.caption { /* margin provided by figure */
 	}
 
 	#banner nav ul {list-style: none; margin: 0 auto; max-width: 800px;}
+	#banner nav ul::after {content: ""; display: table; clear: both;}
 	#banner nav li {float: left; display: inline; margin: 0;}
 
 	#banner nav a:link, #banner nav a:visited {
@@ -229,6 +230,57 @@ div.figure p.caption, figure p.caption { /* margin provided by figure */
 		color: #fff;
 		text-shadow: none !important;
 	}
+
+	/* Social dropdown in top nav */
+	#banner nav li.has-submenu {
+		float: right;
+		position: relative;
+	}
+	#banner nav li.has-submenu > a::after {
+		content: ' \25BE';
+		font-size: 0.85em;
+	}
+	#banner nav .submenu {
+		display: none;
+		position: absolute;
+		top: 100%;
+		right: 0;
+		background: #F5F4EF;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		min-width: 160px;
+		z-index: 100;
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+	}
+	#banner nav li.has-submenu:hover .submenu,
+	#banner nav li.has-submenu:focus-within .submenu {
+		display: block;
+	}
+	#banner nav .submenu li {
+		float: none;
+		display: block;
+	}
+	#banner nav .submenu a:link,
+	#banner nav .submenu a:visited {
+		display: block;
+		padding: 5px 1em 5px 32px;
+		height: auto;
+		color: #000305;
+		background-repeat: no-repeat;
+		background-position: 8px center;
+		background-size: 16px 16px;
+	}
+	#banner nav .submenu a:hover,
+	#banner nav .submenu a:active {
+		background-color: #C74451;
+		color: #fff;
+	}
+	#banner nav .submenu a[href*='linkedin.com'] {background-image: url('../images/icons/linkedin.png');}
+	#banner nav .submenu a[href*='github.com'] {background-image: url('../images/icons/github.png');}
+	#banner nav .submenu a[href*='gitlab.com'] {background-image: url('../images/icons/gitlab.png');}
 
 	#banner nav li:first-child a {
 		border-top-left-radius: 5px;
