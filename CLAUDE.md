@@ -13,7 +13,7 @@ The publish flow is `pelican content -s publishconf.py` → manually `cp` select
 
 **Why:** Two articles deployed on cipherpop.com (`breaking-out-of-docker.html`, `security-scanning-with-sast-in-gitlab-ci.html`) have **no source markdown** anywhere — the `.md` files are lost. Any `ghp-import`-style flow rebuilds only what's in `content/` and wipes the rest. Manual cherry-pick preserves them.
 
-The `pages/archive.html` page links to those two legacy posts so they remain reachable from nav even though they're not regenerated.
+The `pages/writing.html` page (in nav) lists ALL posts chronologically, including the two legacy ones, so they remain reachable. `pages/archive.html` still exists on `main` (never delete) but was dropped from nav in favor of Writing on 2026-07-22.
 
 ## Editing rules
 
@@ -33,7 +33,7 @@ The `pages/archive.html` page links to those two legacy posts so they remain rea
 
 ## Top-nav
 
-Pinned order via `MENUITEMS` in `pelicanconf.py`: **Development | Bio | Game Design | Archive**. Categories and auto-page menus are disabled to keep this exact order.
+Pinned order via `MENUITEMS` in `pelicanconf.py`: **Development | Bio | Game Design | Writing**. Categories and auto-page menus are disabled to keep this exact order. (Resume comes first via its own entry; Archive was swapped for Writing on 2026-07-22.)
 
 ## Theme
 

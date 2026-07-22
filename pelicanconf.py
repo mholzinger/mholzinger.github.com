@@ -42,7 +42,7 @@ MENUITEMS = (
     ('Development', '/pages/development.html'),
     ('Bio',         '/pages/bio.html'),
     ('Game Design', '/pages/game-design.html'),
-    ('Archive',     '/pages/archive.html'),
+    ('Writing',     '/pages/writing.html'),
 )
 
 PLUGINS = [
