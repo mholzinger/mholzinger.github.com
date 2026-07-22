@@ -17,6 +17,7 @@ The `pages/archive.html` page links to those two legacy posts so they remain rea
 
 ## Editing rules
 
+- **Never copy `output/index.html` to `main`.** The live landing page is a minimal hand-curated links page (nav only, no article feed). Pelican's generated index replaces it with an inline article feed — the user explicitly wants the original landing page kept (decided 2026-07-22). Articles are reachable from the front page's nav (e.g. the Game Design page links to write-ups), not from an index feed. A `pelican` build overwrites `output/index.html` locally; for a faithful preview, restore it with `git show main:index.html > output/index.html` after building.
 - **Never delete published articles.** If retiring, add to the Archive page; don't `rm` HTML on `main` and don't remove sources for posts that were ever live.
 - **Unpublished drafts** (in `content/` but never deployed) CAN be deleted if the user explicitly says so. (Example: in May 2026 we deleted four Nov-2023 GitLab CI drafts at user request.)
 - **Don't push or deploy without explicit OK.** Show the file list / diff and wait for sign-off.
