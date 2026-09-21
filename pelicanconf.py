@@ -43,6 +43,7 @@ MENUITEMS = (
     ('Bio',         '/pages/bio.html'),
     ('Game Design', '/pages/game-design.html'),
     ('Writing',     '/pages/writing.html'),
+    ('Consulting',  '/pages/consulting.html'),
 )
 
 PLUGINS = [
