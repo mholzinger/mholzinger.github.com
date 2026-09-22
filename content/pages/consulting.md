@@ -2,11 +2,9 @@ Title: Consulting
 Date: 2026-09-21
 Slug: consulting
 
-I do software development and technology consulting through Cipherpop LLC. I am the sole member of the company. There are no employees.
+I do software development and technology consulting through Cipherpop LLC. I have 18 years of software engineering experience, and I'm available for corp-to-corp contracts and direct consulting engagements.
 
-## What I can be hired for
-
-Eighteen years of software engineering. Available for corp-to-corp contracts and direct consulting engagements.
+## Hire me for…
 
 - Python, and systems programming in ANSI C
 - Protocol security: PKI, cryptography, TLS and mTLS, identity and secrets infrastructure
@@ -15,7 +13,7 @@ Eighteen years of software engineering. Available for corp-to-corp contracts and
 - Backend and systems work
 - Shell and automation tooling (Bash, PowerShell)
 
-## The business
+## About Cipherpop
 
 - Cipherpop LLC, a New York limited liability company, formed September 2026 in Kings County
 - Single member, no employees
